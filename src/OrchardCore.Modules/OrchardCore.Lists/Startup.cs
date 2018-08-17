@@ -9,6 +9,7 @@ using OrchardCore.ContentManagement.Handlers;
 using OrchardCore.Contents.Services;
 using OrchardCore.ContentTypes.Editors;
 using OrchardCore.Data.Migration;
+using OrchardCore.Environment.Navigation;
 using OrchardCore.Feeds;
 using OrchardCore.Lists.Drivers;
 using OrchardCore.Lists.Feeds;
@@ -34,7 +35,8 @@ namespace OrchardCore.Lists
             services.AddSingleton<IIndexProvider, ContainedPartIndexProvider>();
             services.AddScoped<IContentDisplayDriver, ContainedPartDisplayDriver>();
             services.AddTransient<IContentAdminFilter, ListPartContentAdminFilter>();
-
+            services.AddScoped<INavigationProvider, AdminMenu>();
+            
             // List Part
             services.AddScoped<IContentPartDisplayDriver, ListPartDisplayDriver>();
             services.AddSingleton<ContentPart, ListPart>();
