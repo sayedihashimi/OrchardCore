@@ -1,0 +1,43 @@
+@model OrchardCore.ContentTree.ViewModels.ContentTreePresetIndexViewModel
+
+<h1>@RenderTitleSegments(T["Content Trees"])</h1>
+
+<nav class="admin-toolbar">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a asp-route-action="Create" class="btn btn-primary" role="button">@T["Add Content Tree"]</a>
+        </li>
+    </ul>
+    <form asp-action="Index" method="get" class="form-inline my-2 my-lg-0">
+        <input id="search-box" asp-for="Options.Search" class="form-control mr-sm-2" type="text" placeholder="@T["Search"]" autofocus="autofocus">
+        <button type="submit" class="btn btn-secondary">@T["Search"]</button>
+    </form>
+</nav>
+<form asp-action="Index">
+    @* the form ins necessary to generate an antiforgery token for the delete action *@
+    @if (Model.ContentTreePresets.Any())
+    {
+        <ul class="list-group">
+            @foreach (var entry in Model.ContentTreePresets)
+            {
+                <li class="list-group-item">
+                    <div class="properties">
+                        <div class="related">
+                            <a asp-action="Edit" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-primary btn-sm">@T["Edit"]</a>
+                            <a asp-action="Delete" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-danger btn-sm" itemprop="RemoveUrl UnsafeUrl">@T["Delete"]</a>
+                        </div>
+                        <a asp-action="Display" asp-route-id="@entry.ContentTreePreset.Id">@entry.ContentTreePreset.Name</a>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            @T["<strong>Nothing here!</strong> There are no content trees for the moment."]
+        </div>
+    }
+</form>
+
+@await  DisplayAsync(Model.Pager)
