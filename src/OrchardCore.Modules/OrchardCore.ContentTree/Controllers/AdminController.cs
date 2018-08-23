@@ -26,6 +26,7 @@ using OrchardCore.ContentTree.Models;
 using OrchardCore.ContentTree.Indexes;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Localization;
+using OrchardCore.ContentTree.Services;
 
 namespace OrchardCore.ContentTree.Controllers
 {
@@ -33,14 +34,18 @@ namespace OrchardCore.ContentTree.Controllers
     {
         private readonly IAuthorizationService _authorizationService;
         private readonly ISession _session;
+        private readonly IDisplayManager<TreeNode> _displayManager;
+        private readonly IEnumerable<ITreeNodeProviderFactory> _factories;
         private readonly ISiteService _siteService;
         private readonly INotifier _notifier;
 
         public AdminController(
             IAuthorizationService authorizationService,
             ISession session,
+            IDisplayManager<TreeNode> displayManager,
             ISiteService siteService,
-            IShapeFactory shapeFactory,
+            IEnumerable<ITreeNodeProviderFactory> factories,
+            IShapeFactory shapeFactory,            
             INotifier notifier,
             IStringLocalizer<AdminController> stringLocalizer,
             IHtmlLocalizer<AdminController> htmlLocalizer,
@@ -49,6 +54,8 @@ namespace OrchardCore.ContentTree.Controllers
             _authorizationService = authorizationService;
             _session = session;
             _siteService = siteService;
+            _displayManager = displayManager;
+            _factories = factories;
             New = shapeFactory;
             _notifier = notifier;
 
@@ -78,18 +85,18 @@ namespace OrchardCore.ContentTree.Controllers
                 options = new ContentTreePresetIndexOptions();
             }
 
-            var deploymentPlans = _session.Query<ContentTreePreset, ContentTreePresetIndex>();
+            var contentTreePresets = _session.Query<ContentTreePreset, ContentTreePresetIndex>();
 
             if (!string.IsNullOrWhiteSpace(options.Search))
             {
-                deploymentPlans = deploymentPlans.Where(dp => dp.Name.Contains(options.Search));
+                contentTreePresets = contentTreePresets.Where(dp => dp.Name.Contains(options.Search));
             }
 
-            var count = await deploymentPlans.CountAsync();
+            var count = await contentTreePresets.CountAsync();
 
             var startIndex = pager.GetStartIndex();
             var pageSize = pager.PageSize;
-            var results = await deploymentPlans
+            var results = await contentTreePresets
                 .Skip(startIndex)
                 .Take(pageSize)
                 .ListAsync();
@@ -105,6 +112,47 @@ namespace OrchardCore.ContentTree.Controllers
                 ContentTreePresets = results.Select(x => new ContentTreePresetEntry { ContentTreePreset = x }).ToList(),
                 Options = options,
                 Pager = pagerShape
+            };
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Display(int id)
+        {
+            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageContentTree))
+            {
+                return Unauthorized();
+            }
+
+            var contentTreePreset = await _session.GetAsync<ContentTreePreset>(id);
+
+            if (contentTreePreset == null)
+            {
+                return NotFound();
+            }
+
+            var items = new List<dynamic>();
+            foreach (var treeNode in contentTreePreset.TreeNodes)
+            {
+                dynamic item = await _displayManager.BuildDisplayAsync(treeNode, this, "Summary");
+                item.TreeNode = treeNode;
+                items.Add(item);
+            }
+
+            var thumbnails = new Dictionary<string, dynamic>();
+            foreach (var factory in _factories)
+            {
+                var treeNode = factory.Create();
+                dynamic thumbnail = await _displayManager.BuildDisplayAsync(treeNode, this, "Thumbnail");
+                thumbnail.TreeNode = treeNode;
+                thumbnails.Add(factory.Name, thumbnail);
+            }
+
+            var model = new DisplayContentTreePresetViewModel
+            {
+                ContentTreePreset = contentTreePreset,
+                Items = items,
+                Thumbnails = thumbnails,
             };
 
             return View(model);

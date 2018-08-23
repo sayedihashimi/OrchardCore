@@ -9,6 +9,6 @@ namespace OrchardCore.ContentTree.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        //public List<DeploymentStep> DeploymentSteps { get; } = new List<DeploymentStep>();
+        public List<TreeNode> TreeNodes { get; } = new List<TreeNode>();
     }
 }
