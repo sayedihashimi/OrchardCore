@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using OrchardCore.ContentTree.Drivers;
 using OrchardCore.ContentTree.Indexes;
-using OrchardCore.ContentTree.Models;
+using OrchardCore.ContentTree.Trees;
 using OrchardCore.ContentTree.Services;
 using OrchardCore.Data.Migration;
 using OrchardCore.DisplayManagement;
@@ -16,6 +16,7 @@ using OrchardCore.Modules;
 using OrchardCore.Security.Permissions;
 using OrchardCore.Settings;
 using YesSql.Indexes;
+using OrchardCore.ContentTree.Models;
 
 namespace OrchardCore.ContentTree
 {
@@ -29,10 +30,16 @@ namespace OrchardCore.ContentTree
             services.AddTransient<IDataMigration, Migrations>();
 
             services.AddScoped<IDisplayDriver<ISite>, ContentTreeSettingsDisplayDriver>();
-            
-            // dummy link treeNode
-            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<DummyLinkTreeNode>());
+
+            services.AddScoped<IContentTreePresetProvider, ContentTreePresetProvider>();
+            services.AddScoped<ContentTreeNavigationManager, ContentTreeNavigationManager>();
+
             services.AddScoped<IDisplayManager<TreeNode>, DisplayManager<TreeNode>>();
+
+            // dummy link treeNode
+            //services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<DummyLinkTreeNode>());
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<DummyLinkTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, DummyLinkTreeNodeNavigationBuilder>();
             services.AddScoped<IDisplayDriver<TreeNode>, DummyLinkTreeNodeDriver>();
 
         }

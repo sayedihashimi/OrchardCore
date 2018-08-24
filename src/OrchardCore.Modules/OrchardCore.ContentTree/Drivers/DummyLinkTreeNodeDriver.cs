@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using OrchardCore.ContentTree.Models;
+using OrchardCore.ContentTree.Trees;
 using OrchardCore.ContentTree.ViewModels;
 using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.DisplayManagement.ModelBinding;

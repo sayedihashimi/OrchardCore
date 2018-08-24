@@ -119,6 +119,7 @@ namespace OrchardCore.ContentTree.Controllers
             if (ModelState.IsValid)
             {
                 treeNode.Id = model.TreeNodeId;
+                treeNode.Name = model.TreeNodeType;
                 contentTreePreset.TreeNodes.Add(treeNode);
                 _session.Save(contentTreePreset);
 

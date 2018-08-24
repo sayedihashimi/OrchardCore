@@ -1,14 +1,21 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Localization;
 using OrchardCore.ContentTree.Drivers;
+using OrchardCore.ContentTree.Services;
 using OrchardCore.Environment.Navigation;
+using System.Linq;
 
 namespace OrchardCore.ContentTree
 {
     public class AdminMenu : INavigationProvider
     {
-        public AdminMenu(IStringLocalizer<AdminMenu> localizer)
+        private readonly ContentTreeNavigationManager _contentTreeNavigationManager;
+
+        public AdminMenu(ContentTreeNavigationManager contentTreeNavigationManager,
+            IStringLocalizer<AdminMenu> localizer)
         {
+            _contentTreeNavigationManager = contentTreeNavigationManager;
             S = localizer;
         }
 
@@ -21,6 +28,7 @@ namespace OrchardCore.ContentTree
                 return;
             }
 
+            // Configuration and settings menus for the ContentTree module
             builder
                 .Add(S["Configuration"], configuration => configuration
                     .Add(S["Settings"], settings => settings
@@ -35,6 +43,10 @@ namespace OrchardCore.ContentTree
                         .Action("List", "Admin", new { area = "OrchardCore.ContentTree" })
                         .LocalNav()
                     ));
+
+            // This is the entry point for the contentTree. 
+            // Dinamycally generated menus that will appear under the root "Content" admin menu.
+            _contentTreeNavigationManager.BuildNavigation("contenttree", builder);
         }
     }
 }
