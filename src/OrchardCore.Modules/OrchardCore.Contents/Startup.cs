@@ -69,6 +69,9 @@ namespace OrchardCore.Contents
             // TODO: Move to feature
             services.AddScoped<IFeedItemBuilder, CommonFeedItemBuilder>();
 
+
+            services.AddScoped<FilterBoxService>();
+
             services.AddTagHelpers(typeof(ContentLinkTagHelper).Assembly);
         }
 
