@@ -36,11 +36,10 @@ namespace OrchardCore.ContentTree
 
             services.AddScoped<IDisplayManager<TreeNode>, DisplayManager<TreeNode>>();
 
-            // dummy link treeNode
-            //services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<DummyLinkTreeNode>());
-            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<DummyLinkTreeNode>());
-            services.AddScoped<ITreeNodeNavigationBuilder, DummyLinkTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, DummyLinkTreeNodeDriver>();
+            // link treeNode
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<LinkTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, LinkTreeNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<TreeNode>, LinkTreeNodeDriver>();
 
         }
 

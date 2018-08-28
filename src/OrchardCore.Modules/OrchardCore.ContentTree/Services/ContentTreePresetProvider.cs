@@ -28,7 +28,8 @@ namespace OrchardCore.ContentTree.Services
 
             var presetId = siteSettings.As<ContentTreeSettings>().ContentTreePresetId;
 
-            return await GetPreset(presetId);
+           return await GetPreset(presetId);
+            
         }
 
         public async Task<ContentTreePreset> GetPreset(int id)

@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.ResourceManagement\OrchardCore.ResourceManagement.csproj" />
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.Users.Abstractions\OrchardCore.Users.Abstractions.csproj" />
     <ProjectReference Include="..\..\OrchardCore\OrchardCore.Workflows.Abstractions\OrchardCore.Workflows.Abstractions.csproj" />
+    <ProjectReference Include="..\OrchardCore.ContentTree\OrchardCore.ContentTree.csproj" />
 
     <ProjectReference Include="..\OrchardCore.Navigation\OrchardCore.Navigation.csproj" />
     <ProjectReference Include="..\OrchardCore.Settings\OrchardCore.Settings.csproj" />

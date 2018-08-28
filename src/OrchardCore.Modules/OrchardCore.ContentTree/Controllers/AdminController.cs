@@ -96,10 +96,23 @@ namespace OrchardCore.ContentTree.Controllers
 
             var startIndex = pager.GetStartIndex();
             var pageSize = pager.PageSize;
-            var results = await contentTreePresets
+            IEnumerable<ContentTreePreset> results = new List<ContentTreePreset>();
+
+            //todo: handle the case where there is a deserialization exception on some of the presets.
+            // load at least the ones without error. Provide a way to delete the ones on error.
+            try
+            {
+                results = await contentTreePresets
                 .Skip(startIndex)
                 .Take(pageSize)
                 .ListAsync();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error when retrieving the list of content tree presets");
+                _notifier.Error(H["Error when retrieving the list of content tree presets"]);
+            }
+            
 
             // Maintain previous route data when generating page links
             var routeData = new RouteData();

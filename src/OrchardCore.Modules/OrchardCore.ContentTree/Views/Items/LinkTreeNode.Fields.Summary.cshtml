@@ -1,9 +1,9 @@
-@model ShapeViewModel<DummyLinkTreeNode>
+@model ShapeViewModel<LinkTreeNode>
 
 @{
     string linkText = Model.Value.LinkText;
     string linkUrl = Model.Value.LinkUrl;
 }
 
-<h5>@T["Dummy Link"]</h5>
+<h5>@T["Link"]</h5>
 <code>Link text: @linkText --  Link url: @linkUrl</code>

@@ -1,6 +1,6 @@
 @model EditContentTreePresetTreeNodeViewModel
 
-<h1>@RenderTitleSegments(T["Edit Tree Node"])</h1>
+<h3>@RenderTitleSegments(T["Edit {0}", Model.TreeNode.Name])</h3>
 
 <div asp-validation-summary="ModelOnly"></div>
 <form asp-action="Edit" method="post">

@@ -16,6 +16,9 @@ using OrchardCore.Contents.Models;
 using OrchardCore.Contents.Recipes;
 using OrchardCore.Contents.Services;
 using OrchardCore.Contents.TagHelpers;
+using OrchardCore.Contents.Trees;
+using OrchardCore.ContentTree.Models;
+using OrchardCore.ContentTree.Services;
 using OrchardCore.ContentTypes.Editors;
 using OrchardCore.Data.Migration;
 using OrchardCore.Deployment;
@@ -59,6 +62,8 @@ namespace OrchardCore.Contents
             services.AddScoped<IContentTypePartDefinitionDisplayDriver, CommonPartSettingsDisplayDriver>();
             services.AddScoped<IContentPartDisplayDriver, DateEditorDriver>();
             services.AddScoped<IContentPartDisplayDriver, OwnerEditorDriver>();
+
+
 
             // Feeds
             // TODO: Move to feature
@@ -144,6 +149,23 @@ namespace OrchardCore.Contents
             services.AddTransient<IDeploymentSource, ContentDeploymentSource>();
             services.AddSingleton<IDeploymentStepFactory>(new DeploymentStepFactory<ContentDeploymentStep>());
             services.AddScoped<IDisplayDriver<DeploymentStep>, ContentDeploymentStepDriver>();
+        }
+    }
+
+    [RequireFeatures("OrchardCore.ContentTree")]
+    public class ContentTreeStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            // all content types treeNode
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<AllContentTypesTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, AllContentTypesTreeNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<TreeNode>, AllContentTypesTreeNodeDriver>();
+
+            // selected content types treenode
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<ContentTypesTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, ContentTypesTreeNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<TreeNode>, ContentTypesTreeNodeDriver>();
         }
     }
 }

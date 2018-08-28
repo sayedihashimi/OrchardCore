@@ -1,6 +1,6 @@
-@model DummyLinkTreeNodeViewModel
+@model LinkTreeNodeViewModel
 
-<h5>@T["Dummy Link"]</h5>
+<h5>@T["Link Tree Node"]</h5>
 
 <div class="form-group" asp-validation-class-for="LinkText">
     <label asp-for="LinkText">@T["Link Text"] <span asp-validation-for="LinkText"></span></label>
@@ -10,6 +10,7 @@
 
 <div class="form-group">
     <label asp-for="LinkUrl">@T["Link Url"]</label>
-    <code><textarea asp-for="LinkUrl" class="form-control"></textarea></code>
+    <input asp-for="LinkUrl" class="form-control"></input>
     <span class="hint">@T["The url of the link."]</span>
 </div>
+

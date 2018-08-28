@@ -38,30 +38,6 @@ namespace OrchardCore.Contents
             var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
 
             var creatable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Creatable).OrderBy(ctd => ctd.DisplayName);
-            var listable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable).OrderBy(ctd => ctd.DisplayName);
-
-
-            builder.Add(T["Content"], "1.4", content =>
-            {
-                content.AddClass("content").Id("content")
-               .Add(T["Content Items"], "1", contentItems =>
-               {
-                   contentItems
-                   .LinkToFirstChild(false)
-                   .Permission(Permissions.EditOwnContent)
-                   .Action("List", "Admin", new { area = "OrchardCore.Contents" });
-
-                   foreach (var ctd in listable)
-                   {
-                       var rv = new RouteValueDictionary();
-                       // todo: merge filterbox branch or this won't work yet because the content item list is not ready to read the querystring.
-                       rv.Add("contentType", ctd.Name);
-                       contentItems.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
-                   }
-               });
-            });
-
-
             if (creatable.Any())
             {
                 builder.Add(T["New"], "-1", async newMenu =>

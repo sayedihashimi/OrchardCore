@@ -45,7 +45,7 @@ namespace OrchardCore.ContentTree
                     ));
 
             // This is the entry point for the contentTree. 
-            // Dinamycally generated menus that will appear under the root "Content" admin menu.
+            // Dynamically generated menus that will appear under the root "Content" admin menu.
             _contentTreeNavigationManager.BuildNavigation("contenttree", builder);
         }
     }

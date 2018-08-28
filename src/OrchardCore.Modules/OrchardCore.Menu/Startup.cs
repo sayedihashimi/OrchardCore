@@ -2,12 +2,16 @@ using Microsoft.Extensions.DependencyInjection;
 using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Display.ContentDisplay;
 using OrchardCore.ContentManagement.Handlers;
+using OrchardCore.ContentTree.Models;
+using OrchardCore.ContentTree.Services;
 using OrchardCore.Data.Migration;
 using OrchardCore.DisplayManagement.Descriptors;
+using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.Lists.Drivers;
 using OrchardCore.Menu.Handlers;
 using OrchardCore.Menu.Models;
 using OrchardCore.Menu.TagHelpers;
+using OrchardCore.Menu.Trees;
 using OrchardCore.Modules;
 using OrchardCore.Security.Permissions;
 
@@ -31,6 +35,18 @@ namespace OrchardCore.Menu
             services.AddSingleton<ContentPart, LinkMenuItemPart>();
 
             services.AddTagHelpers(typeof(MenuTagHelper).Assembly);
+        }
+    }
+
+
+    [RequireFeatures("OrchardCore.ContentTree")]
+    public class ContentTreeStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<MenuTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, MenuTreeNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<TreeNode>, MenuTreeNodeDriver>();
         }
     }
 }

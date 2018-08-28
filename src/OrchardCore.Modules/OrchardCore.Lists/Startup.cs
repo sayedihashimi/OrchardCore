@@ -7,8 +7,11 @@ using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Display.ContentDisplay;
 using OrchardCore.ContentManagement.Handlers;
 using OrchardCore.Contents.Services;
+using OrchardCore.ContentTree.Models;
+using OrchardCore.ContentTree.Services;
 using OrchardCore.ContentTypes.Editors;
 using OrchardCore.Data.Migration;
+using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.Environment.Navigation;
 using OrchardCore.Feeds;
 using OrchardCore.Lists.Drivers;
@@ -17,6 +20,7 @@ using OrchardCore.Lists.Indexes;
 using OrchardCore.Lists.Models;
 using OrchardCore.Lists.Services;
 using OrchardCore.Lists.Settings;
+using OrchardCore.Lists.Trees;
 using OrchardCore.Lists.ViewModels;
 using OrchardCore.Modules;
 using YesSql.Indexes;
@@ -35,7 +39,6 @@ namespace OrchardCore.Lists
             services.AddSingleton<IIndexProvider, ContainedPartIndexProvider>();
             services.AddScoped<IContentDisplayDriver, ContainedPartDisplayDriver>();
             services.AddTransient<IContentAdminFilter, ListPartContentAdminFilter>();
-            services.AddScoped<INavigationProvider, AdminMenu>();
             
             // List Part
             services.AddScoped<IContentPartDisplayDriver, ListPartDisplayDriver>();
@@ -59,6 +62,18 @@ namespace OrchardCore.Lists
                 template: "Contents/Lists/{contentItemId}/rss",
                 defaults: new { controller = "Feed", action = "Index", format = "rss"}
             );
+        }
+    }
+
+
+    [RequireFeatures("OrchardCore.ContentTree")]
+    public class ContentTreeStartup : StartupBase
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<ListsTreeNode>());
+            services.AddScoped<ITreeNodeNavigationBuilder, ListsTreeNodeNavigationBuilder>();
+            services.AddScoped<IDisplayDriver<TreeNode>, ListsTreeNodeDriver>();
         }
     }
 }

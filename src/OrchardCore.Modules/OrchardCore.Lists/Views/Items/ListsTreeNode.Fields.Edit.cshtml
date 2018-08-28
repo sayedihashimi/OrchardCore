@@ -1,0 +1,40 @@
+@model ListsTreeNodeViewModel
+@inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
+
+@{
+    var selectedTypes = (string[])Model.ContentTypes;
+    // todo: see if we should restrict the list to creatable/listable only
+    var listTypes = ContentDefinitionManager.ListTypeDefinitions()
+        .Where(ctd => ctd.Parts.Any(p => p.PartDefinition.Name.Equals(typeof(ListPart).Name, StringComparison.OrdinalIgnoreCase)))
+        .ToList();
+}
+
+<h5>@T["Lists"]</h5>
+
+<fieldset class="form-group">
+    <div class="row">
+        <div class="col-sm">
+            <span class="hint">@T["The content types to add to the menu."]</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <ul class="list-group">
+                @foreach (var contentTypeDefinition in listTypes)
+                {
+                    var name = contentTypeDefinition.Name;
+                    var checkd = selectedTypes?.Contains(name);
+
+                    <li class="list-group-item">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input class="form-check-input" type="checkbox" name="@Html.NameFor(m => m.ContentTypes)" value="@name" checked="@checkd">
+                                @contentTypeDefinition.DisplayName
+                            </label>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</fieldset>

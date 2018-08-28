@@ -39,7 +39,12 @@ namespace OrchardCore.ContentTree.Services
                 return;
             }
 
-            var treeNodes = _contentTreePresetProvider.GetDefaultPreset().Result.TreeNodes.ToArray();
+            var treeNodes = _contentTreePresetProvider.GetDefaultPreset().Result?.TreeNodes.ToArray();
+
+            if (treeNodes == null)
+            {
+                return;
+            }
 
             foreach (TreeNode treeNode in treeNodes)
             {

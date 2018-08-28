@@ -1,0 +1,23 @@
+@model ShapeViewModel<MenuTreeNode>
+@inject OrchardCore.ContentManagement.Metadata.IContentDefinitionManager ContentDefinitionManager
+@inject OrchardCore.ContentManagement.IContentManager ContentManager
+
+@{
+    var menuItemIds = Model.Value.Selected;
+}
+
+<h5>@T["Menu content items"]</h5>
+
+@if (menuItemIds != null && menuItemIds.Length > 0)
+{
+    @foreach (var contentItemId in menuItemIds)
+    {
+        var ci = ContentManager.GetAsync(contentItemId).Result;
+        var displayName = ((ContentItemMetadata)await ContentManager.PopulateAspectAsync<ContentItemMetadata>(ci)).DisplayText;
+        <span class="badge badge-info">@displayName</span>
+    }
+}
+else
+{
+    <span class="badge badge-warning">@T["Nothing here!"]</span>
+}

@@ -13,7 +13,7 @@
             @foreach (var preset in Model.ContentTreePresets)
             {
                 <option value="@preset.Key" selected="@(Model.ContentTreePreset == preset.Key)">
-                    @preset.Key  @preset.Value
+                    @preset.Value
                 </option>
             }
         </select>
