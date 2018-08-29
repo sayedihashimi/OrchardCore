@@ -39,7 +39,7 @@ namespace OrchardCore.Contents.Trees
 
             var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
 
-            //var listable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable).OrderBy(ctd => ctd.DisplayName);
+            
             var selected = contentTypeDefinitions.Where(ctd => tn.ContentTypes.ToList<string>().Contains(ctd.Name));
 
             builder.Add(T["Content"], "1.4", content =>
@@ -56,7 +56,7 @@ namespace OrchardCore.Contents.Trees
                    {
                        var rv = new RouteValueDictionary();
                        // todo: merge filterbox branch or this won't work yet because the content item list is not ready to read the querystring.
-                       rv.Add("contentType", ctd.Name);
+                       rv.Add("Options.TypeName", ctd.Name);
                        contentItems.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
                    }
                });
