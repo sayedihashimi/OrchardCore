@@ -10,6 +10,7 @@ using OrchardCore.ContentTree.Trees;
 using OrchardCore.Environment.Navigation;
 using System.Linq;
 using OrchardCore.ContentManagement.Metadata.Settings;
+using OrchardCore.ContentManagement.Metadata.Models;
 
 namespace OrchardCore.Contents.Trees
 {
@@ -39,8 +40,8 @@ namespace OrchardCore.Contents.Trees
 
             var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
 
-            
-            var selected = contentTypeDefinitions.Where(ctd => tn.ContentTypes.ToList<string>().Contains(ctd.Name));
+
+            var typesToShow = GetContentTypes(tn);
 
             builder.Add(T["Content"], "1.4", content =>
             {
@@ -52,15 +53,28 @@ namespace OrchardCore.Contents.Trees
                    .Permission(Permissions.EditOwnContent)
                    .Action("List", "Admin", new { area = "OrchardCore.Contents" });
 
-                   foreach (var ctd in selected)
+                   foreach (var ctd in typesToShow)
                    {
                        var rv = new RouteValueDictionary();
-                       // todo: merge filterbox branch or this won't work yet because the content item list is not ready to read the querystring.
                        rv.Add("Options.TypeName", ctd.Name);
                        contentItems.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
                    }
                });
             });
+        }
+
+
+        private IEnumerable<ContentTypeDefinition> GetContentTypes(ContentTypesTreeNode tn)
+        {
+            var typesToShow = _contentDefinitionManager.ListTypeDefinitions().
+                Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable);
+
+            if(tn.ShowAll == false)
+            {
+                typesToShow = typesToShow.Where(ctd => tn.ContentTypes.ToList<string>().Contains(ctd.Name));
+            }
+            
+            return typesToShow.OrderBy( t => t.Name);
         }
     }
 }

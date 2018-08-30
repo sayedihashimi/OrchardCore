@@ -25,6 +25,7 @@ namespace OrchardCore.Contents.Trees
         {
             return Initialize<ContentTypesTreeNodeViewModel>("ContentTypesTreeNode_Fields_Edit", model =>
             {
+                model.ShowAll = treeNode.ShowAll;
                 model.ContentTypes = treeNode.ContentTypes;
             }).Location("Content");
         }
@@ -34,7 +35,7 @@ namespace OrchardCore.Contents.Trees
             // Initializes the value to empty otherwise the model is not updated if no type is selected.
             treeNode.ContentTypes = Array.Empty<string>();
 
-            await updater.TryUpdateModelAsync(treeNode, Prefix, x => x.ContentTypes);
+            await updater.TryUpdateModelAsync(treeNode, Prefix, x => x.ShowAll, x => x.ContentTypes);
             return Edit(treeNode);
         }
     }

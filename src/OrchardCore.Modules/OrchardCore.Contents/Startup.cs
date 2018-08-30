@@ -160,12 +160,6 @@ namespace OrchardCore.Contents
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            // all content types treeNode
-            services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<AllContentTypesTreeNode>());
-            services.AddScoped<ITreeNodeNavigationBuilder, AllContentTypesTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, AllContentTypesTreeNodeDriver>();
-
-            // selected content types treenode
             services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<ContentTypesTreeNode>());
             services.AddScoped<ITreeNodeNavigationBuilder, ContentTypesTreeNodeNavigationBuilder>();
             services.AddScoped<IDisplayDriver<TreeNode>, ContentTypesTreeNodeDriver>();

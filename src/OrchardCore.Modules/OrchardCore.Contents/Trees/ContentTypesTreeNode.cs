@@ -13,6 +13,7 @@ namespace OrchardCore.Contents.Trees
     /// </summary>
     public class ContentTypesTreeNode : TreeNode
     {
+        public bool ShowAll { get; set; }
         public string[] ContentTypes { get; set; }
     }
 }

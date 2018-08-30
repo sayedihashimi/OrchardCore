@@ -1,9 +1,0 @@
-@model AllContentTypesTreeNodeViewModel
-
-<h5>@T["All Content Types"]</h5>
-
-<div class="form-group" asp-validation-class-for="Name">
-    <label asp-for="Name">@T["Name"] <span asp-validation-for="Name"></span></label>
-    <input asp-for="Name" class="form-control" />
-    <span class="hint">@T["Name of this tree node"]</span>
-</div>
