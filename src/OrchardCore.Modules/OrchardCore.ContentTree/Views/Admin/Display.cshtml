@@ -1,5 +1,14 @@
 @model DisplayContentTreePresetViewModel
 @using Microsoft.AspNetCore.Routing
+@inject OrchardCore.DisplayManagement.IDisplayManager<TreeNode> TreeNodeDisplayManager
+@inject OrchardCore.DisplayManagement.ModelBinding.IUpdateModelAccessor ModelUpdaterAccessor
+
+@{
+    var index = 0;
+}
+<script asp-src="/OrchardCore.Menu/Scripts/menu.js" at="Foot" depends-on="admin"></script>
+<style asp-src="/OrchardCore.Menu/Styles/menu.min.css" debug-src="/OrchardCore.Menu/Styles/menu.css"></style>
+<div asp-validation-summary="All"></div>
 
 <h3>@RenderTitleSegments(T["Edit Preset: {0}", Model.ContentTreePreset.Name])</h3>
 <a asp-action="List">@T["Content Tree Presets"]</a> \ <span> @Model.ContentTreePreset.Name</span>
@@ -15,19 +24,23 @@
     </ul>
 </nav>
 
-<form asp-action="DeploymentPlan">
-    @if (Model.Items.Any())
+<form id="presetForm" asp-action="Display">
+    @if (Model.ContentTreePreset.TreeNodes.Any())
     {
-        <ul class="list-group">
-            @foreach (var item in Model.Items)
-            {
-                item.ContentTreePresetId = Model.ContentTreePreset.Id;
+        var updater = ModelUpdaterAccessor.ModelUpdater;
 
-                <li class="list-group-item">
-                    @await DisplayAsync(item)
-                </li>
+        <ol id="menu" class="list-group" data-treenode-id="content-preset">
+            @foreach (var treeNode in Model.ContentTreePreset.TreeNodes)
+            {
+                dynamic treeNodeShape = await TreeNodeDisplayManager.BuildDisplayAsync(treeNode, updater, "Summary");
+                treeNodeShape.ContentTreePresetId = Model.ContentTreePreset.Id;
+                treeNodeShape.TreeNode = treeNode;
+                treeNodeShape.Index = index++;
+
+                @await DisplayAsync(treeNodeShape)
+
             }
-        </ul>
+        </ol>
     }
     else
     {
@@ -35,6 +48,9 @@
             @T["<strong>Nothing here!</strong> There are no tree nodes on this preset for the moment."]
         </div>
     }
+
+    <input asp-for="Hierarchy" type="hidden" value="" />
+    <input id="id" type="hidden" value="@Model.ContentTreePreset.Id" />
 </form>
 
 <!-- Modal -->
@@ -63,3 +79,72 @@
         </div>
     </div>
 </div>
+
+
+
+<script at="Foot">
+    var menuItemId;
+    var confirmLeave;
+
+    function moveTreeNode(contentTreePresetId, nodeToMoveId, destinationNodeId, position) {
+        var url = "@Url.Action("MoveTreeNode", "Admin", new { area = "OrchardCore.ContentTree"})";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: {
+                __RequestVerificationToken: $("input[name='__RequestVerificationToken']").val(),
+                contentTreePresetId: contentTreePresetId,
+                nodeToMoveId: nodeToMoveId,
+                destinationNodeId: destinationNodeId,
+                position: position
+            },
+            success: function (data) {
+                console.log('node moved');
+            },
+            error: function (error) {
+                console.error(error.responseText);
+                
+                alert("@T["There was an error when moving the tree node"]");
+            }
+        });
+    }
+
+    $(function () {
+        $('#menu')
+            .nestedSortable({
+                handle: 'div.menu-item-title',
+                items: 'li.menu-item',
+                toleranceElement: '> div.menu-item-title',
+                relocate: function (event, helper, c, d) {
+                    console.log('relocating...');
+                    console.log(helper.item);
+
+                    confirmLeave = true;
+
+                    $('#@Html.IdFor(m => m.Hierarchy)').attr('value', JSON.stringify($('#menu').nestedSortable('toHierarchy')));
+                    var contentTreePresetId = @Model.ContentTreePreset.Id;
+                    var nodeToMoveId = helper.item.data('treenode-id');
+                    var destinationNodeId = helper.item.parent().closest('[data-treenode-id]').data('treenode-id'); // get the id of the new parent
+                    var position = helper.item.index();
+                    
+                    console.log('content tree preset id is : ' + contentTreePresetId);
+                    console.log('node to move id is : ' + nodeToMoveId);
+                    console.log('dest node id is : ' + destinationNodeId);
+                    console.log('position is : ' + position);
+
+                    moveTreeNode(contentTreePresetId, nodeToMoveId, destinationNodeId, position);
+                    //$('#presetForm').submit();
+
+                }
+            });
+
+
+        $('#menu').closest("form").on('submit', function (e) {
+            confirmLeave = false;
+            window.onbeforeunload = function () { };
+        });
+
+    });
+
+
+</script>

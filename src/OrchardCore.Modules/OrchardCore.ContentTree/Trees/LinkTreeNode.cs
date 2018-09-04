@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using OrchardCore.ContentTree.Models;
 using OrchardCore.Environment.Navigation;
 
@@ -15,4 +16,5 @@ namespace OrchardCore.ContentTree.Trees
         [Required]
         public string LinkUrl { get; set; }
     }
+
 }

@@ -27,6 +27,8 @@ using OrchardCore.ContentTree.Indexes;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Localization;
 using OrchardCore.ContentTree.Services;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace OrchardCore.ContentTree.Controllers
 {
@@ -45,7 +47,7 @@ namespace OrchardCore.ContentTree.Controllers
             IDisplayManager<TreeNode> displayManager,
             ISiteService siteService,
             IEnumerable<ITreeNodeProviderFactory> factories,
-            IShapeFactory shapeFactory,            
+            IShapeFactory shapeFactory,
             INotifier notifier,
             IStringLocalizer<AdminController> stringLocalizer,
             IHtmlLocalizer<AdminController> htmlLocalizer,
@@ -112,7 +114,7 @@ namespace OrchardCore.ContentTree.Controllers
                 Logger.LogError(ex, "Error when retrieving the list of content tree presets");
                 _notifier.Error(H["Error when retrieving the list of content tree presets"]);
             }
-            
+
 
             // Maintain previous route data when generating page links
             var routeData = new RouteData();
@@ -144,14 +146,6 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var items = new List<dynamic>();
-            foreach (var treeNode in contentTreePreset.TreeNodes)
-            {
-                dynamic item = await _displayManager.BuildDisplayAsync(treeNode, this, "Summary");
-                item.TreeNode = treeNode;
-                items.Add(item);
-            }
-
             var thumbnails = new Dictionary<string, dynamic>();
             foreach (var factory in _factories)
             {
@@ -164,12 +158,112 @@ namespace OrchardCore.ContentTree.Controllers
             var model = new DisplayContentTreePresetViewModel
             {
                 ContentTreePreset = contentTreePreset,
-                Items = items,
                 Thumbnails = thumbnails,
             };
 
             return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> MoveTreeNode(int contentTreePresetId, string nodeToMoveId,
+            string destinationNodeId, int position)
+        {
+            if (!await _authorizationService.AuthorizeAsync(User, Permissions.ManageContentTree))
+            {
+                return Unauthorized();
+            }
+
+            var contentTreePreset = await _session.GetAsync<ContentTreePreset>(contentTreePresetId);
+
+            if ((contentTreePreset == null) || (contentTreePreset.TreeNodes == null))
+            {
+                return NotFound();
+            }
+
+
+            // todo: this node-moving logic should be a method on ContentTreePreset, or TreeNode, or extension method
+            var nodeToMove = GetNodeById(contentTreePreset.TreeNodes, nodeToMoveId);
+            var destinationNode = destinationNodeId == "content-preset" ? null : GetNodeById(contentTreePreset.TreeNodes, destinationNodeId);
+
+            
+            // remove the node from its original position
+            if (contentTreePreset.TreeNodes.Contains(nodeToMove)) // todo: avoid this check by having a single TreeNode as a property of the content tree preset.
+            {
+                contentTreePreset.TreeNodes.Remove(nodeToMove);
+            }
+            else
+            {
+                RemoveNode(contentTreePreset.TreeNodes, nodeToMove);
+            }
+
+            // insert the node at the destination node
+            if (destinationNode == null)
+            {
+                contentTreePreset.TreeNodes.Insert(position, nodeToMove);                
+            }
+            else
+            {
+               InsertNode(contentTreePreset.TreeNodes, nodeToMove, destinationNode, position);
+            }
+            
+            _session.Save(contentTreePreset);
+            
+            return RedirectToAction(nameof(Display), new { id = contentTreePresetId });
+        }
+
+        private TreeNode GetNodeById(IEnumerable<TreeNode> sourceTree, string id)
+        {
+            var tempStack = new Stack<TreeNode>(sourceTree);
+
+            while (tempStack.Any())
+            {
+                // evaluate first node
+                TreeNode node = tempStack.Pop();
+                if (node.Id.Equals(id, StringComparison.OrdinalIgnoreCase)) return node;
+
+                // not that one; continue with the rest.
+                foreach (var n in node.TreeNodes) tempStack.Push(n);
+            }
+
+            //not found
+            return null;
+        }
+
+        private void RemoveNode(IEnumerable<TreeNode> sourceTree, TreeNode nodeToRemove)
+        {
+            var tempStack = new Stack<TreeNode>(sourceTree);
+            while (tempStack.Any())
+            {
+                // evaluate first
+                TreeNode node = tempStack.Pop();
+                if (node.TreeNodes.Contains(nodeToRemove))
+                {
+                    node.TreeNodes.Remove(nodeToRemove);                    
+                }
+
+                // not that one. continue
+                foreach (var n in node.TreeNodes) tempStack.Push(n);
+            }
+        }
+
+        private void InsertNode(IEnumerable<TreeNode> sourceTree,
+                TreeNode nodeToInsert, TreeNode destinationNode, int position)
+        {
+            var tempStack = new Stack<TreeNode>(sourceTree);
+            while (tempStack.Any())
+            {
+                // evaluate first
+                TreeNode node = tempStack.Pop();
+                if (node.Equals(destinationNode))
+                {
+                    node.TreeNodes.Insert(position, nodeToInsert);
+                }
+
+                // not that one. continue
+                foreach (var n in node.TreeNodes) tempStack.Push(n);
+            }
+        }
+
 
         public async Task<IActionResult> Create()
         {
