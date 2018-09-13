@@ -120,7 +120,6 @@ namespace OrchardCore.ContentTree.Controllers
             if (ModelState.IsValid)
             {
                 treeNode.UniqueId = model.TreeNodeId;
-                treeNode.ItemType = model.TreeNodeType;
                 contentTreePreset.MenuItems.Add(treeNode);
                 _session.Save(contentTreePreset);
 

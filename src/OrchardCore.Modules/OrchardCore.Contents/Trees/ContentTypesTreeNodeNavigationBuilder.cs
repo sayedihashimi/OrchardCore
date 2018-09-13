@@ -49,8 +49,8 @@ namespace OrchardCore.Contents.Trees
 
             // Add external children
             foreach (var childTreeNode in tn.Items)
-            {
-                var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.ItemType).FirstOrDefault();
+            {   
+                var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.GetType().Name).FirstOrDefault();
                 treeBuilder.BuildNavigation(childTreeNode, builder, treeNodeBuilders);
             }
         }

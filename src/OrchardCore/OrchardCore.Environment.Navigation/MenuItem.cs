@@ -20,7 +20,6 @@ namespace OrchardCore.Environment.Navigation
         }
 
         public string UniqueId { get; set; }
-        public string ItemType { get; set; } //i.e: LinkTreeNode, ContentTypeTreeNode ...
 
         /// <summary>
         /// The text to display with the menu item.

@@ -51,14 +51,14 @@ namespace OrchardCore.ContentTree.Services
 
             foreach (MenuItem menuItem in menuItems)
             {
-                var treeNodeCustomLogicBuilder = _treeNodeNavigationBuilders.Where(x => x.Name == menuItem.ItemType).FirstOrDefault();
+                var treeNodeCustomLogicBuilder = _treeNodeNavigationBuilders.Where(x => x.Name == menuItem.GetType().Name).FirstOrDefault();
                 if (treeNodeCustomLogicBuilder != null)
                 {
                     treeNodeCustomLogicBuilder.BuildNavigation(menuItem, builder, _treeNodeNavigationBuilders);
                 }
                 else
                 {
-                    Logger.LogError("No Builder registered for treeNode of type '{TreeNodeName}'", menuItem.ItemType);
+                    Logger.LogError("No Builder registered for treeNode of type '{TreeNodeName}'", menuItem.GetType().Name);
                 }
             }
         }

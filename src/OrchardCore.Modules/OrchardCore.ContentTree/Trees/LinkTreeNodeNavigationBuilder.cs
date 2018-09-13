@@ -31,7 +31,7 @@ namespace OrchardCore.ContentTree.Trees
                 // Add the childrens of the actual link
                 foreach (var childTreeNode in menuItem.Items)
                 {
-                    var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.ItemType).FirstOrDefault();
+                    var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.GetType().Name).FirstOrDefault();
                     treeBuilder.BuildNavigation(childTreeNode, itemBuilder, treeNodeBuilders);
                 }
             });
