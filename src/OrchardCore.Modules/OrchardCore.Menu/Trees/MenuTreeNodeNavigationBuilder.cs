@@ -47,26 +47,6 @@ namespace OrchardCore.Menu.Trees
                 return;
             }
 
-            var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
-
-            //var listable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable).OrderBy(ctd => ctd.DisplayName);
-            var selected = contentTypeDefinitions.Where(ctd => tn.Selected.ToList<string>().Contains(ctd.Name));
-
-            builder.Add(T["Content"], "1.4", content =>
-            {
-                content.AddClass("content").Id("content")
-               .Add(T["Menu"], "1", contentItems =>
-               {
-                   contentItems
-                   .LinkToFirstChild(false)
-                   .Action("List", "Admin", new { area = "OrchardCore.Contents" });
-
-                   foreach (var ctd in selected)
-                   {
-
-                   }
-               });
-            });
         }
     }
 }
