@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Localization;
-using OrchardCore.ContentTree.Drivers;
 using OrchardCore.ContentTree.Services;
 using OrchardCore.Environment.Navigation;
 using System.Linq;
@@ -29,15 +28,7 @@ namespace OrchardCore.ContentTree
             }
 
             // Configuration and settings menus for the ContentTree module
-            builder
-                .Add(S["Configuration"], configuration => configuration
-                    .Add(S["Settings"], settings => settings
-                        .Add(S["Content Tree"], "2" , contentTree => contentTree
-                            .Action("Index", "Admin", new { area = "OrchardCore.Settings", groupId = ContentTreeSettingsDisplayDriver.GroupId })
-                            .Permission(Permissions.ManageContentTree)
-                            .LocalNav()
-                        )))
-                .Add(S["Configuration"], content => content
+            builder.Add(S["Configuration"], content => content
                     .Add(S["Content Tree"], "1.5", layers => layers
                         .Permission(Permissions.ManageContentTree)
                         .Action("List", "Admin", new { area = "OrchardCore.ContentTree" })

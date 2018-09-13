@@ -20,11 +20,15 @@
                 <li class="list-group-item">
                     <div class="properties">
                         <div class="related">
-                            <a asp-action="Display" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-primary btn-sm">@T["Edit"]</a>
-                            <a asp-action="Edit" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-primary btn-sm">@T["Rename"]</a>
+                            <a asp-action="Display" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-primary btn-sm">@T["Edit Items"]</a>
+                            <a asp-action="Edit" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-primary btn-sm">@T["Edit"]</a>
                             <a asp-action="Delete" asp-route-id="@entry.ContentTreePreset.Id" class="btn btn-danger btn-sm" itemprop="RemoveUrl UnsafeUrl">@T["Delete"]</a>
                         </div>
-                        <a asp-action="Display" asp-route-id="@entry.ContentTreePreset.Id">@entry.ContentTreePreset.Name</a>
+                        <a asp-action="Display" class="@(entry.ContentTreePreset.Enabled ? "" : "text-muted")" asp-route-id="@entry.ContentTreePreset.Id">@entry.ContentTreePreset.Name</a>
+                        @if (entry.ContentTreePreset.Enabled == false)
+	                    {
+		                    <span class="text-muted font-italic">(@T["Disabled"])</span>
+	                    }
                     </div>
                 </li>
             }

@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Localization;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using OrchardCore.ContentTree.Models;
 using OrchardCore.Environment.Navigation;
 using YesSql;
-using System.Linq;
-using Microsoft.Extensions.Logging;
 
 namespace OrchardCore.ContentTree.Services
 {
@@ -16,17 +14,15 @@ namespace OrchardCore.ContentTree.Services
     // This class is itself one more INavigationProvider so it can be called from this module's AdminMenu.cs
     public class ContentTreeNavigationProviderCoordinator : INavigationProvider
     {
-        //private readonly ISession _session;
-        private readonly IContentTreePresetProvider _contentTreePresetProvider;
         private readonly IEnumerable<ITreeNodeNavigationBuilder> _treeNodeNavigationBuilders;
-
+        private readonly ISession _session;
 
         public ContentTreeNavigationProviderCoordinator(
-            IContentTreePresetProvider contentTreePresetProvider,
+            ISession session,
             IEnumerable<ITreeNodeNavigationBuilder> treeNodeNavigationBuilders,
             ILogger<ContentTreeNavigationProviderCoordinator> logger)
         {
-            _contentTreePresetProvider = contentTreePresetProvider;
+            _session = session;
             _treeNodeNavigationBuilders = treeNodeNavigationBuilders;
         }
 
@@ -42,7 +38,11 @@ namespace OrchardCore.ContentTree.Services
                 return;
             }
 
-            var menuItems = _contentTreePresetProvider.GetDefaultPreset().Result?.MenuItems.ToArray();
+            //var menuItems = _contentTreePresetProvider.GetDefaultPreset().Result?.MenuItems.ToArray();
+
+            var enabledPresets = _session.Query<ContentTreePreset>().ListAsync().Result.
+                                    Where(x => x.Enabled == true);
+            var menuItems = enabledPresets.SelectMany(x => x.MenuItems);
 
             if (menuItems == null)
             {

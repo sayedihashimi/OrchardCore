@@ -288,7 +288,7 @@ namespace OrchardCore.ContentTree.Controllers
 
             if (ModelState.IsValid)
             {
-                var contentTreePreset = new ContentTreePreset { Name = model.Name };
+                var contentTreePreset = new ContentTreePreset { Name = model.Name, Enabled = model.Enabled };
 
                 _session.Save(contentTreePreset);
                 return RedirectToAction(nameof(List));
@@ -314,7 +314,8 @@ namespace OrchardCore.ContentTree.Controllers
 
             var model = new EditContentTreeViewModel
             {
-                Name = contentTreePreset.Name
+                Name = contentTreePreset.Name,
+                Enabled = contentTreePreset.Enabled            
             };
 
             return View(model);
@@ -346,6 +347,7 @@ namespace OrchardCore.ContentTree.Controllers
             if (ModelState.IsValid)
             {
                 contentTreePreset.Name = model.Name;
+                contentTreePreset.Enabled = model.Enabled;
 
                 _session.Save(contentTreePreset);
 

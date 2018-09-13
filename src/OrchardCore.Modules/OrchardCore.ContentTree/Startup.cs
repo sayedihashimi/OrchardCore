@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using OrchardCore.ContentTree.Drivers;
 using OrchardCore.ContentTree.Indexes;
 using OrchardCore.ContentTree.Trees;
 using OrchardCore.ContentTree.Services;
@@ -29,9 +28,6 @@ namespace OrchardCore.ContentTree
             services.AddSingleton<IIndexProvider, ContentTreePresetIndexProvider>();
             services.AddTransient<IDataMigration, Migrations>();
 
-            services.AddScoped<IDisplayDriver<ISite>, ContentTreeSettingsDisplayDriver>();
-
-            services.AddScoped<IContentTreePresetProvider, ContentTreePresetProvider>();
             services.AddScoped<ContentTreeNavigationProviderCoordinator, ContentTreeNavigationProviderCoordinator>();
 
             services.AddScoped<IDisplayManager<MenuItem>, DisplayManager<MenuItem>>();

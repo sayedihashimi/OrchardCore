@@ -6,6 +6,7 @@ namespace OrchardCore.ContentTree.ViewModels
     {
         [Required]
         public string Name { get; set; }
+        public bool Enabled { get; set; }
     }
 
     public class EditContentTreeViewModel
@@ -14,5 +15,7 @@ namespace OrchardCore.ContentTree.ViewModels
 
         [Required]
         public string Name { get; set; }
+
+        public bool Enabled { get; set; }
     }
 }
