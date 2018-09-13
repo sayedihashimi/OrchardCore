@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Localization;
 using OrchardCore.ContentTree.Models;
@@ -13,23 +14,27 @@ namespace OrchardCore.ContentTree.Trees
     {
         public string Name => typeof(LinkTreeNode).Name;
 
-        public void BuildNavigation(TreeNode treeNode, NavigationBuilder builder)
+        public void BuildNavigation(MenuItem menuItem, NavigationBuilder builder, IEnumerable<ITreeNodeNavigationBuilder> treeNodeBuilders)
         {
-            var ltn = treeNode as LinkTreeNode;
+            var ltn = menuItem as LinkTreeNode;
 
             if (ltn == null)
             {
                 return;
             }
-            
-            builder
-                .Add(new LocalizedString("Content","Content"), content => content
-                    .Add(new LocalizedString(ltn.LinkText, ltn.LinkText), "1.5", layers => layers
-                        .Permission(Permissions.ManageContentTree)
-                        .Url(ltn.LinkUrl)                        
-                        .LocalNav()
-                    ));
 
+            builder.Add(new LocalizedString(ltn.LinkText, ltn.LinkText), itemBuilder => {
+                
+                // Add the actual link
+                itemBuilder.Url(ltn.LinkUrl);
+
+                // Add the childrens of the actual link
+                foreach (var childTreeNode in menuItem.Items)
+                {
+                    var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.ItemType).FirstOrDefault();
+                    treeBuilder.BuildNavigation(childTreeNode, itemBuilder, treeNodeBuilders);
+                }
+            });
         }
     }
 }

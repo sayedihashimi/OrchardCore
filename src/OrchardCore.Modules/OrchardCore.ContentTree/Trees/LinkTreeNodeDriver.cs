@@ -8,22 +8,23 @@ using OrchardCore.ContentTree.ViewModels;
 using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.DisplayManagement.ModelBinding;
 using OrchardCore.DisplayManagement.Views;
+using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.ContentTree.Trees
 {
-    public class LinkTreeNodeDriver : DisplayDriver<TreeNode, LinkTreeNode>
+    public class LinkTreeNodeDriver : DisplayDriver<MenuItem, LinkTreeNode>
     {
         public override IDisplayResult Display(LinkTreeNode treeNode)
         {
             return Combine(
-                View("LinkTreeNode_Fields_Summary", treeNode).Location("Summary", "Content"),
-                View("LinkTreeNode_Fields_Thumbnail", treeNode).Location("Thumbnail", "Content")
+                View("LinkTreeNode_Fields_TreeSummary", treeNode).Location("TreeSummary", "Content"),
+                View("LinkTreeNode_Fields_TreeThumbnail", treeNode).Location("TreeThumbnail", "Content")
             );
         }
 
         public override IDisplayResult Edit(LinkTreeNode treeNode)
         {
-            return Initialize<LinkTreeNodeViewModel>("LinkTreeNode_Fields_Edit", model =>
+            return Initialize<LinkTreeNodeViewModel>("LinkTreeNode_Fields_TreeEdit", model =>
             {
                 model.LinkText = treeNode.LinkText;
                 model.LinkUrl = treeNode.LinkUrl;

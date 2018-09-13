@@ -162,7 +162,7 @@ namespace OrchardCore.Contents
         {
             services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<ContentTypesTreeNode>());
             services.AddScoped<ITreeNodeNavigationBuilder, ContentTypesTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, ContentTypesTreeNodeDriver>();
+            services.AddScoped<IDisplayDriver<MenuItem>, ContentTypesTreeNodeDriver>();
         }
     }
 }

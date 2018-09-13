@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using OrchardCore.ContentTree.Models;
+using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.ContentTree.ViewModels
 {
@@ -11,7 +12,7 @@ namespace OrchardCore.ContentTree.ViewModels
         public dynamic Editor { get; set; }
 
         [BindNever]
-        public TreeNode TreeNode { get; set; }
+        public MenuItem MenuItem { get; set; }
 
     }
 }

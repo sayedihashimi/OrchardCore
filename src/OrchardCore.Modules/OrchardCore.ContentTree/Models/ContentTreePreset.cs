@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.ContentTree.Models
 {
@@ -9,6 +10,6 @@ namespace OrchardCore.ContentTree.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public List<TreeNode> TreeNodes { get; } = new List<TreeNode>();
+        public List<MenuItem> MenuItems { get; } = new List<MenuItem>();
     }
 }

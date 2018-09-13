@@ -73,7 +73,7 @@ namespace OrchardCore.Lists
         {
             services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<ListsTreeNode>());
             services.AddScoped<ITreeNodeNavigationBuilder, ListsTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, ListsTreeNodeDriver>();
+            services.AddScoped<IDisplayDriver<MenuItem>, ListsTreeNodeDriver>();
         }
     }
 }

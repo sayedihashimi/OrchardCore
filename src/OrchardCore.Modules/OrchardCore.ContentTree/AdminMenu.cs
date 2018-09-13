@@ -10,12 +10,12 @@ namespace OrchardCore.ContentTree
 {
     public class AdminMenu : INavigationProvider
     {
-        private readonly ContentTreeNavigationManager _contentTreeNavigationManager;
+        private readonly ContentTreeNavigationProviderCoordinator _contentTreeNavigationProvider;
 
-        public AdminMenu(ContentTreeNavigationManager contentTreeNavigationManager,
+        public AdminMenu(ContentTreeNavigationProviderCoordinator contentTreeNavigationProvider,
             IStringLocalizer<AdminMenu> localizer)
         {
-            _contentTreeNavigationManager = contentTreeNavigationManager;
+            _contentTreeNavigationProvider = contentTreeNavigationProvider;
             S = localizer;
         }
 
@@ -46,7 +46,7 @@ namespace OrchardCore.ContentTree
 
             // This is the entry point for the contentTree. 
             // Dynamically generated menus that will appear under the root "Content" admin menu.
-            _contentTreeNavigationManager.BuildNavigation("contenttree", builder);
+            _contentTreeNavigationProvider.BuildNavigation("contenttree", builder);
         }
     }
 }

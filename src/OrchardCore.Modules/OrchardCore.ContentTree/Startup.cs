@@ -32,14 +32,14 @@ namespace OrchardCore.ContentTree
             services.AddScoped<IDisplayDriver<ISite>, ContentTreeSettingsDisplayDriver>();
 
             services.AddScoped<IContentTreePresetProvider, ContentTreePresetProvider>();
-            services.AddScoped<ContentTreeNavigationManager, ContentTreeNavigationManager>();
+            services.AddScoped<ContentTreeNavigationProviderCoordinator, ContentTreeNavigationProviderCoordinator>();
 
-            services.AddScoped<IDisplayManager<TreeNode>, DisplayManager<TreeNode>>();
+            services.AddScoped<IDisplayManager<MenuItem>, DisplayManager<MenuItem>>();
 
             // link treeNode
             services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<LinkTreeNode>());
             services.AddScoped<ITreeNodeNavigationBuilder, LinkTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, LinkTreeNodeDriver>();
+            services.AddScoped<IDisplayDriver<MenuItem>, LinkTreeNodeDriver>();
 
         }
 

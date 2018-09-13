@@ -13,6 +13,7 @@ using OrchardCore.ContentTree.ViewModels;
 using OrchardCore.DisplayManagement;
 using OrchardCore.DisplayManagement.ModelBinding;
 using OrchardCore.DisplayManagement.Notify;
+using OrchardCore.Environment.Navigation;
 using OrchardCore.Settings;
 using YesSql;
 
@@ -22,7 +23,7 @@ namespace OrchardCore.ContentTree.Controllers
     public class ContentTreeNodeController : Controller, IUpdateModel
     {
         private readonly IAuthorizationService _authorizationService;
-        private readonly IDisplayManager<TreeNode> _displayManager;
+        private readonly IDisplayManager<MenuItem> _displayManager;
         private readonly IEnumerable<ITreeNodeProviderFactory> _factories;
         private readonly ISession _session;
         private readonly ISiteService _siteService;
@@ -30,7 +31,7 @@ namespace OrchardCore.ContentTree.Controllers
 
         public ContentTreeNodeController(
             IAuthorizationService authorizationService,
-            IDisplayManager<TreeNode> displayManager,
+            IDisplayManager<MenuItem> displayManager,
             IEnumerable<ITreeNodeProviderFactory> factories,
             ISession session,
             ISiteService siteService,
@@ -75,13 +76,13 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            treeNode.Id = Guid.NewGuid().ToString("n");
+            treeNode.UniqueId = Guid.NewGuid().ToString("n");
 
             var model = new EditContentTreePresetTreeNodeViewModel
             {
                 ContentTreePresetId = id,
-                TreeNode = treeNode,
-                TreeNodeId = treeNode.Id,
+                MenuItem = treeNode,
+                TreeNodeId = treeNode.UniqueId,
                 TreeNodeType = type,
                 Editor = await _displayManager.BuildEditorAsync(treeNode, updater: this, isNew: true)
             };
@@ -118,9 +119,9 @@ namespace OrchardCore.ContentTree.Controllers
 
             if (ModelState.IsValid)
             {
-                treeNode.Id = model.TreeNodeId;
-                treeNode.Name = model.TreeNodeType;
-                contentTreePreset.TreeNodes.Add(treeNode);
+                treeNode.UniqueId = model.TreeNodeId;
+                treeNode.ItemType = model.TreeNodeType;
+                contentTreePreset.MenuItems.Add(treeNode);
                 _session.Save(contentTreePreset);
 
                 _notifier.Success(H["TreeNode added successfully"]);
@@ -147,7 +148,7 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = contentTreePreset.TreeNodes.FirstOrDefault(x => String.Equals(x.Id, treeNodeId, StringComparison.OrdinalIgnoreCase));
+            var treeNode = GetNodeById(contentTreePreset.MenuItems, treeNodeId);
 
             if (treeNode == null)
             {
@@ -157,8 +158,8 @@ namespace OrchardCore.ContentTree.Controllers
             var model = new EditContentTreePresetTreeNodeViewModel
             {
                 ContentTreePresetId = id,
-                TreeNode = treeNode,
-                TreeNodeId = treeNode.Id,
+                MenuItem = treeNode,
+                TreeNodeId = treeNode.UniqueId,
                 TreeNodeType = treeNode.GetType().Name,
                 Editor = await _displayManager.BuildEditorAsync(treeNode, updater: this, isNew: false)
             };
@@ -183,7 +184,7 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = contentTreePreset.TreeNodes.FirstOrDefault(x => String.Equals(x.Id, model.TreeNodeId, StringComparison.OrdinalIgnoreCase));
+            var treeNode = GetNodeById(contentTreePreset.MenuItems, model.TreeNodeId);
 
             if (treeNode == null)
             {
@@ -222,19 +223,68 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = contentTreePreset.TreeNodes.FirstOrDefault(x => String.Equals(x.Id, treeNodeId, StringComparison.OrdinalIgnoreCase));
+            var treeNode = GetNodeById(contentTreePreset.MenuItems, treeNodeId);
 
             if (treeNode == null)
             {
                 return NotFound();
             }
 
-            contentTreePreset.TreeNodes.Remove(treeNode);
+            // It is in the first level?
+            if (contentTreePreset.MenuItems.Contains(treeNode))
+            {
+                contentTreePreset.MenuItems.RemoveAll(x => x.Equals(treeNode));
+            }
+            else
+            {
+                RemoveNode(contentTreePreset.MenuItems, treeNode);
+            }
+
+            
             _session.Save(contentTreePreset);
 
             _notifier.Success(H["Tree node deleted successfully"]);
 
             return RedirectToAction("Display", "Admin", new { id });
+        }
+
+
+        // todo: these methods are on AdminController too. It should be centralized in Navigation Project.
+        private MenuItem GetNodeById(IEnumerable<MenuItem> sourceTree, string id)
+        {
+            var tempStack = new Stack<MenuItem>(sourceTree);
+
+            while (tempStack.Any())
+            {
+                // evaluate first node
+                MenuItem node = tempStack.Pop();
+                if (node.UniqueId.Equals(id, StringComparison.OrdinalIgnoreCase)) return node;
+
+                // not that one; continue with the rest.
+                foreach (var n in node.Items) tempStack.Push(n);
+            }
+
+            //not found
+            return null;
+        }
+
+        private void RemoveNode(IEnumerable<MenuItem> sourceTree, MenuItem nodeToRemove)
+        {
+            var tempStack = new Stack<MenuItem>(sourceTree);
+
+            while (tempStack.Any())
+            {
+                // evaluate first node
+                MenuItem node = tempStack.Pop();
+
+                if (node.Items.Contains(nodeToRemove))
+                {
+                    node.Items.Remove(nodeToRemove);
+                }
+
+                // not that one. continue
+                foreach (var n in node.Items) tempStack.Push(n);
+            }
         }
     }
 }

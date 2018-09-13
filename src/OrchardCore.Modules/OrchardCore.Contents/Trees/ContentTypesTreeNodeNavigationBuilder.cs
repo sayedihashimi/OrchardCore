@@ -19,17 +19,15 @@ namespace OrchardCore.Contents.Trees
         private readonly IContentDefinitionManager _contentDefinitionManager;
 
         public ContentTypesTreeNodeNavigationBuilder(
-            IContentDefinitionManager contentDefinitionManager,
-            IStringLocalizer<ContentTypesTreeNodeNavigationBuilder> localizer)
+            IContentDefinitionManager contentDefinitionManager)
         {
             _contentDefinitionManager = contentDefinitionManager;
-            T = localizer;
         }
 
         public string Name => typeof(ContentTypesTreeNode).Name;
-        public IStringLocalizer T { get; set; }
 
-        public void BuildNavigation(TreeNode treeNode, NavigationBuilder builder)
+
+        public void BuildNavigation(MenuItem treeNode, NavigationBuilder builder, IEnumerable<ITreeNodeNavigationBuilder> treeNodeBuilders)
         {
             var tn = treeNode as ContentTypesTreeNode;
 
@@ -38,29 +36,23 @@ namespace OrchardCore.Contents.Trees
                 return;
             }
 
+            // Add ContentTypes specific children
             var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
-
-
             var typesToShow = GetContentTypes(tn);
-
-            builder.Add(T["Content"], "1.4", content =>
+            foreach (var ctd in typesToShow)
             {
-                content.AddClass("content").Id("content")
-               .Add(T["Content by Type"], "1", contentItems =>
-               {
-                   contentItems
-                   .LinkToFirstChild(false)
-                   .Permission(Permissions.EditOwnContent)
-                   .Action("List", "Admin", new { area = "OrchardCore.Contents" });
+                var rv = new RouteValueDictionary();
+                rv.Add("Options.TypeName", ctd.Name);
+                builder.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
+            }
 
-                   foreach (var ctd in typesToShow)
-                   {
-                       var rv = new RouteValueDictionary();
-                       rv.Add("Options.TypeName", ctd.Name);
-                       contentItems.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
-                   }
-               });
-            });
+
+            // Add external children
+            foreach (var childTreeNode in tn.Items)
+            {
+                var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.ItemType).FirstOrDefault();
+                treeBuilder.BuildNavigation(childTreeNode, builder, treeNodeBuilders);
+            }
         }
 
 
@@ -76,5 +68,11 @@ namespace OrchardCore.Contents.Trees
             
             return typesToShow.OrderBy( t => t.Name);
         }
+
+        private void AddExternalChildren(MenuItem menuItem , NavigationBuilder builder, IEnumerable<ITreeNodeNavigationBuilder> treeNodeBuilders)
+        {
+
+        }
     }
+
 }

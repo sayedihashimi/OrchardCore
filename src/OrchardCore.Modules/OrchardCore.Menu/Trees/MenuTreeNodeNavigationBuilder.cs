@@ -38,9 +38,9 @@ namespace OrchardCore.Menu.Trees
         public string Name => typeof(MenuTreeNode).Name;
         public IStringLocalizer T { get; set; }
 
-        public void BuildNavigation(TreeNode treeNode, NavigationBuilder builder)
+        public void BuildNavigation(MenuItem menuItem, NavigationBuilder builder, IEnumerable<ITreeNodeNavigationBuilder> treeNodeBuilders)
         {
-            var tn = treeNode as MenuTreeNode;
+            var tn = menuItem as MenuTreeNode;
 
             if (tn == null)
             {
@@ -51,7 +51,6 @@ namespace OrchardCore.Menu.Trees
 
             //var listable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable).OrderBy(ctd => ctd.DisplayName);
             var selected = contentTypeDefinitions.Where(ctd => tn.Selected.ToList<string>().Contains(ctd.Name));
-
 
             builder.Add(T["Content"], "1.4", content =>
             {
@@ -64,7 +63,7 @@ namespace OrchardCore.Menu.Trees
 
                    foreach (var ctd in selected)
                    {
-                      
+
                    }
                });
             });

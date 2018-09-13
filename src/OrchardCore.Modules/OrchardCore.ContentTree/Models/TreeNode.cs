@@ -5,13 +5,13 @@ using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.ContentTree.Models
 {
-    public abstract class TreeNode 
+    public abstract class TreeNode : MenuItem
     {
         public TreeNode()
         {
-            TreeNodes = new List<TreeNode>();
+            
         }
-        public string Id { get; set; }
+        public string TreeNodeId { get; set; }
         public string Name { get; set; }
 
         public List<TreeNode> TreeNodes { get; set; }

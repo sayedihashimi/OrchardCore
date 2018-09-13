@@ -8,22 +8,23 @@ using OrchardCore.ContentTree.ViewModels;
 using OrchardCore.DisplayManagement.Handlers;
 using OrchardCore.DisplayManagement.ModelBinding;
 using OrchardCore.DisplayManagement.Views;
+using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.Contents.Trees
 {
-    public class ContentTypesTreeNodeDriver : DisplayDriver<TreeNode, ContentTypesTreeNode>
+    public class ContentTypesTreeNodeDriver : DisplayDriver<MenuItem, ContentTypesTreeNode>
     {
         public override IDisplayResult Display(ContentTypesTreeNode treeNode)
         {
             return Combine(
-                View("ContentTypesTreeNode_Fields_Summary", treeNode).Location("Summary", "Content"),
-                View("ContentTypesTreeNode_Fields_Thumbnail", treeNode).Location("Thumbnail", "Content")
+                View("ContentTypesTreeNode_Fields_TreeSummary", treeNode).Location("TreeSummary", "Content"),
+                View("ContentTypesTreeNode_Fields_TreeThumbnail", treeNode).Location("TreeThumbnail", "Content")
             );
         }
 
         public override IDisplayResult Edit(ContentTypesTreeNode treeNode)
         {
-            return Initialize<ContentTypesTreeNodeViewModel>("ContentTypesTreeNode_Fields_Edit", model =>
+            return Initialize<ContentTypesTreeNodeViewModel>("ContentTypesTreeNode_Fields_TreeEdit", model =>
             {
                 model.ShowAll = treeNode.ShowAll;
                 model.ContentTypes = treeNode.ContentTypes;

@@ -1,6 +1,6 @@
 @model DisplayContentTreePresetViewModel
 @using Microsoft.AspNetCore.Routing
-@inject OrchardCore.DisplayManagement.IDisplayManager<TreeNode> TreeNodeDisplayManager
+@inject OrchardCore.DisplayManagement.IDisplayManager<MenuItem> TreeNodeDisplayManager
 @inject OrchardCore.DisplayManagement.ModelBinding.IUpdateModelAccessor ModelUpdaterAccessor
 
 @{
@@ -25,19 +25,24 @@
 </nav>
 
 <form id="presetForm" asp-action="Display">
-    @if (Model.ContentTreePreset.TreeNodes.Any())
+    @if (Model.ContentTreePreset.MenuItems.Any())
     {
         var updater = ModelUpdaterAccessor.ModelUpdater;
 
         <ol id="menu" class="list-group" data-treenode-id="content-preset">
-            @foreach (var treeNode in Model.ContentTreePreset.TreeNodes)
+            @foreach (var menuItem in Model.ContentTreePreset.MenuItems)
             {
-                dynamic treeNodeShape = await TreeNodeDisplayManager.BuildDisplayAsync(treeNode, updater, "Summary");
-                treeNodeShape.ContentTreePresetId = Model.ContentTreePreset.Id;
-                treeNodeShape.TreeNode = treeNode;
-                treeNodeShape.Index = index++;
+                if (menuItem != null)
+                {
+                    dynamic treeNodeShape = await TreeNodeDisplayManager.BuildDisplayAsync(menuItem, updater, "TreeSummary");
+                    treeNodeShape.ContentTreePresetId = Model.ContentTreePreset.Id;
+                    treeNodeShape.MenuItem = menuItem;
+                    treeNodeShape.Index = index++;
 
-                @await DisplayAsync(treeNodeShape)
+                    @await DisplayAsync(treeNodeShape)
+                }
+
+
 
             }
         </ol>
@@ -83,9 +88,6 @@
 
 
 <script at="Foot">
-    var menuItemId;
-    var confirmLeave;
-
     function moveTreeNode(contentTreePresetId, nodeToMoveId, destinationNodeId, position) {
         var url = "@Url.Action("MoveTreeNode", "Admin", new { area = "OrchardCore.ContentTree"})";
         $.ajax({
@@ -103,7 +105,7 @@
             },
             error: function (error) {
                 console.error(error.responseText);
-                
+
                 alert("@T["There was an error when moving the tree node"]");
             }
         });
@@ -115,35 +117,18 @@
                 handle: 'div.menu-item-title',
                 items: 'li.menu-item',
                 toleranceElement: '> div.menu-item-title',
-                relocate: function (event, helper, c, d) {
-                    console.log('relocating...');
-                    console.log(helper.item);
-
-                    confirmLeave = true;
-
-                    $('#@Html.IdFor(m => m.Hierarchy)').attr('value', JSON.stringify($('#menu').nestedSortable('toHierarchy')));
+                relocate: function (event, helper) {
+                    $('#@Html.IdFor(m => m.Hierarchy)').attr('value', JSON.stringify($('#menu').nestedSortable('toHierarchy'))); // todo: remove hierarchy. Not needed.
+                    // get var required by rest api
                     var contentTreePresetId = @Model.ContentTreePreset.Id;
                     var nodeToMoveId = helper.item.data('treenode-id');
                     var destinationNodeId = helper.item.parent().closest('[data-treenode-id]').data('treenode-id'); // get the id of the new parent
                     var position = helper.item.index();
-                    
-                    console.log('content tree preset id is : ' + contentTreePresetId);
-                    console.log('node to move id is : ' + nodeToMoveId);
-                    console.log('dest node id is : ' + destinationNodeId);
-                    console.log('position is : ' + position);
 
+                    // make request to rest api
                     moveTreeNode(contentTreePresetId, nodeToMoveId, destinationNodeId, position);
-                    //$('#presetForm').submit();
-
                 }
             });
-
-
-        $('#menu').closest("form").on('submit', function (e) {
-            confirmLeave = false;
-            window.onbeforeunload = function () { };
-        });
-
     });
 
 

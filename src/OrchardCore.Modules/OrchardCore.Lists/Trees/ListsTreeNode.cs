@@ -11,7 +11,7 @@ namespace OrchardCore.Lists.Trees
     /// <summary>
     /// Adds a menu for each list content type to a <see cref="ContentTreePreset"/>. 
     /// </summary>
-    public class ListsTreeNode : TreeNode
+    public class ListsTreeNode : MenuItem
     {
         public string[] ContentTypes { get; set; }
     }

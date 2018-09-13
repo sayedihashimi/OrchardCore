@@ -3,34 +3,34 @@
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
 
-@inject OrchardCore.DisplayManagement.IDisplayManager<TreeNode> TreeNodeDisplayManager
+@inject OrchardCore.DisplayManagement.IDisplayManager<MenuItem> TreeNodeDisplayManager
 @inject OrchardCore.DisplayManagement.ModelBinding.IUpdateModelAccessor ModelUpdaterAccessor
 
 @{
-    TreeNode treeNode = Model.TreeNode;
-    var children = treeNode.TreeNodes;
+    MenuItem menuItem = Model.MenuItem;
+    var children = menuItem.Items;
     var index = 0;
 }
 
 
-<li class="menu-item" id="menu-id-@Model.Index" data-index="@Model.Index" data-treenode-id="@Model.TreeNode.Id">
-    <div class="menu-item menu-item-title list-group-item" title="@Model.TreeNode.Id">
+<li class="menu-item" id="menu-id-@Model.Index" data-index="@Model.Index" data-treenode-id="@Model.MenuItem.UniqueId">
+    <div class="menu-item menu-item-title list-group-item" title="@Model.MenuItem.UniqueId">
         <div class="properties ">
             <div class="related">
                 <a asp-action="Edit"
                    asp-controller="ContentTreeNode"
                    asp-route-id="@Model.ContentTreePresetId"
-                   asp-route-treeNodeId="@Model.TreeNode.Id"
+                   asp-route-treeNodeId="@Model.MenuItem.UniqueId"
                    class="btn btn-primary btn-sm">@T["Edit"]</a>
 
                 <a asp-action="Delete"
                    asp-controller="ContentTreeNode"
                    asp-route-id="@Model.ContentTreePresetId"
-                   asp-route-treeNodeId="@Model.TreeNode.Id"
+                   asp-route-treeNodeId="@Model.MenuItem.UniqueId"
                    class="btn btn-danger btn-sm"
                    itemprop="RemoveUrl UnsafeUrl">@T["Delete"]</a>
             </div>
-            @await DisplayAsync(Model.Content)
+            @await DisplayAsync(Model.Content) summary treei
         </div>
 
 
@@ -43,9 +43,9 @@
             
             @foreach (var child in children)
             {
-                dynamic treeNodeShape = await TreeNodeDisplayManager.BuildDisplayAsync(child, updater, "Summary");
-                treeNodeShape.ContentTreePresetId = Model.ContentTreePreset.Id;
-                treeNodeShape.TreeNode = child;
+                dynamic treeNodeShape = await TreeNodeDisplayManager.BuildDisplayAsync(child, updater, "TreeSummary");
+                treeNodeShape.ContentTreePresetId = Model.ContentTreePresetId;
+                treeNodeShape.MenuItem = child;
                 treeNodeShape.Index = Model.Index + "-" + index++;
                 @await DisplayAsync(treeNodeShape);
             }

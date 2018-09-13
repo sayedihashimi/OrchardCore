@@ -14,10 +14,11 @@ using OrchardCore.DisplayManagement.Views;
 using YesSql;
 using OrchardCore.Menu.Models;
 using OrchardCore.ContentManagement.Records;
+using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.Menu.Trees
 {
-    public class MenuTreeNodeDriver : DisplayDriver<TreeNode, MenuTreeNode>
+    public class MenuTreeNodeDriver : DisplayDriver<MenuItem, MenuTreeNode>
     {
         private readonly IContentDefinitionManager _contentDefinitionManager;
         private readonly IContentManager _contentManager;
@@ -35,8 +36,8 @@ namespace OrchardCore.Menu.Trees
         public override IDisplayResult Display(MenuTreeNode treeNode)
         {
             return Combine(
-                View("MenuTreeNode_Fields_Summary", treeNode).Location("Summary", "Content"),
-                View("MenuTreeNode_Fields_Thumbnail", treeNode).Location("Thumbnail", "Content")
+                View("MenuTreeNode_Fields_TreeSummary", treeNode).Location("TreeSummary", "Content"),
+                View("MenuTreeNode_Fields_TreeThumbnail", treeNode).Location("TreeThumbnail", "Content")
             );
         }
 
@@ -65,7 +66,7 @@ namespace OrchardCore.Menu.Trees
                 x => x.ContentItemId,
                 x => _contentManager.PopulateAspectAsync<ContentItemMetadata>(x).Result.DisplayText);
 
-            return Initialize<MenuTreeNodeViewModel>("MenuTreeNode_Fields_Edit", model =>
+            return Initialize<MenuTreeNodeViewModel>("MenuTreeNode_Fields_TreeEdit", model =>
             {
                 model.AvailableMenuContentItems = menuItems;
                 model.Selected = treeNode.Selected;

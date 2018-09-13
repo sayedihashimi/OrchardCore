@@ -7,6 +7,7 @@ using OrchardCore.ContentTree.Services;
 using OrchardCore.Data.Migration;
 using OrchardCore.DisplayManagement.Descriptors;
 using OrchardCore.DisplayManagement.Handlers;
+using OrchardCore.Environment.Navigation;
 using OrchardCore.Lists.Drivers;
 using OrchardCore.Menu.Handlers;
 using OrchardCore.Menu.Models;
@@ -46,7 +47,7 @@ namespace OrchardCore.Menu
         {
             services.AddSingleton<ITreeNodeProviderFactory>(new TreeNodeProviderFactory<MenuTreeNode>());
             services.AddScoped<ITreeNodeNavigationBuilder, MenuTreeNodeNavigationBuilder>();
-            services.AddScoped<IDisplayDriver<TreeNode>, MenuTreeNodeDriver>();
+            services.AddScoped<IDisplayDriver<MenuItem>, MenuTreeNodeDriver>();
         }
     }
 }

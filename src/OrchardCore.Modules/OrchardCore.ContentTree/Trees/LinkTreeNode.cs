@@ -9,7 +9,7 @@ using OrchardCore.Environment.Navigation;
 
 namespace OrchardCore.ContentTree.Trees
 {
-    public class LinkTreeNode : TreeNode
+    public class LinkTreeNode : MenuItem
     {
         [Required]
         public string LinkText { get; set; }
