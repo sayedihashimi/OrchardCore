@@ -147,7 +147,7 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = GetNodeById(contentTreePreset.MenuItems, treeNodeId);
+            var treeNode = contentTreePreset.GetMenuItemById(treeNodeId);
 
             if (treeNode == null)
             {
@@ -183,7 +183,7 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = GetNodeById(contentTreePreset.MenuItems, model.TreeNodeId);
+            var treeNode = contentTreePreset.GetMenuItemById(model.TreeNodeId);
 
             if (treeNode == null)
             {
@@ -222,68 +222,24 @@ namespace OrchardCore.ContentTree.Controllers
                 return NotFound();
             }
 
-            var treeNode = GetNodeById(contentTreePreset.MenuItems, treeNodeId);
+            var treeNode = contentTreePreset.GetMenuItemById(treeNodeId);
 
             if (treeNode == null)
             {
                 return NotFound();
             }
 
-            // It is in the first level?
-            if (contentTreePreset.MenuItems.Contains(treeNode))
+            if (contentTreePreset.RemoveMenuItem(treeNode) == false)
             {
-                contentTreePreset.MenuItems.RemoveAll(x => x.Equals(treeNode));
+                return new StatusCodeResult(500);
             }
-            else
-            {
-                RemoveNode(contentTreePreset.MenuItems, treeNode);
-            }
-
+            
             
             _session.Save(contentTreePreset);
 
             _notifier.Success(H["Tree node deleted successfully"]);
 
             return RedirectToAction("Display", "Admin", new { id });
-        }
-
-
-        // todo: these methods are on AdminController too. It should be centralized in Navigation Project.
-        private MenuItem GetNodeById(IEnumerable<MenuItem> sourceTree, string id)
-        {
-            var tempStack = new Stack<MenuItem>(sourceTree);
-
-            while (tempStack.Any())
-            {
-                // evaluate first node
-                MenuItem node = tempStack.Pop();
-                if (node.UniqueId.Equals(id, StringComparison.OrdinalIgnoreCase)) return node;
-
-                // not that one; continue with the rest.
-                foreach (var n in node.Items) tempStack.Push(n);
-            }
-
-            //not found
-            return null;
-        }
-
-        private void RemoveNode(IEnumerable<MenuItem> sourceTree, MenuItem nodeToRemove)
-        {
-            var tempStack = new Stack<MenuItem>(sourceTree);
-
-            while (tempStack.Any())
-            {
-                // evaluate first node
-                MenuItem node = tempStack.Pop();
-
-                if (node.Items.Contains(nodeToRemove))
-                {
-                    node.Items.Remove(nodeToRemove);
-                }
-
-                // not that one. continue
-                foreach (var n in node.Items) tempStack.Push(n);
-            }
         }
     }
 }

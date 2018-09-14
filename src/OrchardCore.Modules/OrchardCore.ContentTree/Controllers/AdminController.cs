@@ -182,87 +182,27 @@ namespace OrchardCore.ContentTree.Controllers
             }
 
 
-            // todo: this node-moving logic should be a method on ContentTreePreset, or TreeNode, or extension method
-            var nodeToMove = GetNodeById(contentTreePreset.MenuItems, nodeToMoveId);
-            var destinationNode = destinationNodeId == "content-preset" ? null : GetNodeById(contentTreePreset.MenuItems, destinationNodeId);
-
-            
-            // remove the node from its original position
-            if (contentTreePreset.MenuItems.Contains(nodeToMove)) // todo: avoid this check by having a single TreeNode as a property of the content tree preset.
+            var nodeToMove = contentTreePreset.GetMenuItemById(nodeToMoveId);
+            if (nodeToMove == null)
             {
-                contentTreePreset.MenuItems.Remove(nodeToMove);
-            }
-            else
-            {
-                RemoveNode(contentTreePreset.MenuItems, nodeToMove);
+                return NotFound();
             }
 
-            // insert the node at the destination node
-            if (destinationNode == null)
+            var destinationNode = contentTreePreset.GetMenuItemById(destinationNodeId); // don't check for null. When null the item will be moved to the root.
+
+            if (contentTreePreset.RemoveMenuItem(nodeToMove) == false)
+            {   
+                
+            }            
+
+            if(contentTreePreset.InsertMenuItemAt(nodeToMove, destinationNode, position) == false)
             {
-                contentTreePreset.MenuItems.Insert(position, nodeToMove);                
-            }
-            else
-            {
-               InsertNode(contentTreePreset.MenuItems, nodeToMove, destinationNode, position);
+                return StatusCode(500);
             }
             
             _session.Save(contentTreePreset);
             
             return RedirectToAction(nameof(Display), new { id = contentTreePresetId });
-        }
-
-        private MenuItem GetNodeById(IEnumerable<MenuItem> sourceTree, string id)
-        {
-            var tempStack = new Stack<MenuItem>(sourceTree);
-
-            while (tempStack.Any())
-            {
-                // evaluate first node
-                MenuItem node = tempStack.Pop();
-                if (node.UniqueId.Equals(id, StringComparison.OrdinalIgnoreCase)) return node;
-
-                // not that one; continue with the rest.
-                foreach (var n in node.Items) tempStack.Push(n);
-            }
-
-            //not found
-            return null;
-        }
-
-        private void RemoveNode(IEnumerable<MenuItem> sourceTree, MenuItem nodeToRemove)
-        {
-            var tempStack = new Stack<MenuItem>(sourceTree);
-            while (tempStack.Any())
-            {
-                // evaluate first
-                MenuItem node = tempStack.Pop();
-                if (node.Items.Contains(nodeToRemove))
-                {
-                    node.Items.Remove(nodeToRemove);                    
-                }
-
-                // not that one. continue
-                foreach (var n in node.Items) tempStack.Push(n);
-            }
-        }
-
-        private void InsertNode(IEnumerable<MenuItem> sourceTree,
-                MenuItem nodeToInsert, MenuItem destinationNode, int position)
-        {
-            var tempStack = new Stack<MenuItem>(sourceTree);
-            while (tempStack.Any())
-            {
-                // evaluate first
-                MenuItem node = tempStack.Pop();
-                if (node.Equals(destinationNode))
-                {
-                    node.Items.Insert(position, nodeToInsert);
-                }
-
-                // not that one. continue
-                foreach (var n in node.Items) tempStack.Push(n);
-            }
         }
 
 
