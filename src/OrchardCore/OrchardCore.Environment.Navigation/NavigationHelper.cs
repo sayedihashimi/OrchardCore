@@ -71,8 +71,11 @@ namespace OrchardCore.Environment.Navigation
             // if route match failed, try comparing URL strings, if
             if (!match && !String.IsNullOrWhiteSpace(menuItem.Href) && menuItem.Href != "#")
             {
-                string url = menuItem.Href.Replace("~/", viewContext.HttpContext.Request.PathBase);
-                match = viewContext.HttpContext.Request.Path.Equals(url, StringComparison.OrdinalIgnoreCase);
+                var request = viewContext.HttpContext.Request;
+                string menuItemUrl = menuItem.Href.Replace("~/", request.PathBase);
+                string requestUrl = request.PathBase + request.Path.Add(request.QueryString);
+
+                match = requestUrl.Equals(menuItemUrl, StringComparison.OrdinalIgnoreCase);
             }
 
             menuItemShape.Selected = match;
