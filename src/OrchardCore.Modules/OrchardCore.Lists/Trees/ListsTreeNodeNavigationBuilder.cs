@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Localization;
@@ -23,7 +24,7 @@ namespace OrchardCore.Lists.Trees
         {
             _contentDefinitionManager = contentDefinitionManager;
             _contentManager = contentManager;
-            _session = session;        
+            _session = session;
         }
 
         public string Name => typeof(ListsTreeNode).Name;
@@ -32,39 +33,47 @@ namespace OrchardCore.Lists.Trees
         {
             var tn = menuItem as ListsTreeNode;
 
-            if (tn == null)
+            if ((tn == null) || (!tn.Enabled))
             {
                 return;
             }
 
             var contentTypeDefinitions = _contentDefinitionManager.ListTypeDefinitions().OrderBy(d => d.Name);
-
-            //var listable = contentTypeDefinitions.Where(ctd => ctd.Settings.ToObject<ContentTypeSettings>().Listable).OrderBy(ctd => ctd.DisplayName);
+                        
             var selected = contentTypeDefinitions
                 .Where(ctd => tn.ContentTypes.ToList<string>().Contains(ctd.Name))
                 .Where(ctd => ctd.DisplayName != null);
 
             foreach (var ctd in selected)
+            {                
+                if (tn.AddContentTypeAsParent)
+                {
+                    builder.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), listTypeMenu => { AddContentItems(listTypeMenu, ctd.Name); });
+                }
+                else
+                {
+                    AddContentItems(builder, ctd.Name);
+                }
+            }
+        }
+
+        private async void AddContentItems(NavigationBuilder listTypeMenu, string contentTypeName)
+        {
+            var ListContentItems = await _session.Query<ContentItem, ContentItemIndex>()
+                .With<ContentItemIndex>(x => x.Latest)
+                .With<ContentItemIndex>(x => x.ContentType == contentTypeName)
+                .ListAsync();
+
+            foreach (var ci in ListContentItems)
             {
-                builder.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), async listTypeMenu =>
-               {
-                   var ListContentItems = await _session.Query<ContentItem, ContentItemIndex>()
-                       .With<ContentItemIndex>(x => x.Latest)
-                       .With<ContentItemIndex>(x => x.ContentType == ctd.Name)
-                       .ListAsync();
+                var cim = await _contentManager.PopulateAspectAsync<ContentItemMetadata>(ci);
 
-                   foreach (var ci in ListContentItems)
-                   {
-                       var cim = await _contentManager.PopulateAspectAsync<ContentItemMetadata>(ci);
-
-                       if ((cim.AdminRouteValues.Any()) && (cim.DisplayText != null))
-                       {
-                           listTypeMenu.Add(new LocalizedString(cim.DisplayText, cim.DisplayText), m => m
-                           .Action(cim.AdminRouteValues["Action"] as string, cim.AdminRouteValues["Controller"] as string, cim.AdminRouteValues)
-                           .LocalNav());
-                       }
-                   }
-               });
+                if ((cim.AdminRouteValues.Any()) && (cim.DisplayText != null))
+                {
+                    listTypeMenu.Add(new LocalizedString(cim.DisplayText, cim.DisplayText), m => m
+                    .Action(cim.AdminRouteValues["Action"] as string, cim.AdminRouteValues["Controller"] as string, cim.AdminRouteValues)
+                    .LocalNav());
+                }
             }
         }
     }

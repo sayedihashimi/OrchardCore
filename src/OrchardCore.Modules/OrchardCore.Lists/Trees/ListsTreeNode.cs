@@ -20,5 +20,7 @@ namespace OrchardCore.Lists.Trees
         // classes added through the admin.
         public string[] CustomClasses { get; set; } = Array.Empty<string>();
 
+        public bool AddContentTypeAsParent { get; set; } = true;
+
     }
 }

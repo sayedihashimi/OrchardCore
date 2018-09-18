@@ -29,6 +29,7 @@ namespace OrchardCore.Lists.Trees
                 model.ContentTypes = treeNode.ContentTypes;
                 model.Enabled = treeNode.Enabled;
                 model.CustomClasses = string.Join(",", treeNode.CustomClasses);
+                model.AddContentTypeAsParent = treeNode.AddContentTypeAsParent;
             }).Location("Content");
         }
 
@@ -36,10 +37,11 @@ namespace OrchardCore.Lists.Trees
         {
             var model = new ListsTreeNodeViewModel();
 
-            if (await updater.TryUpdateModelAsync(model, Prefix, x => x.ContentTypes)) {
+            if (await updater.TryUpdateModelAsync(model, Prefix, x => x.ContentTypes, x => x.Enabled, x => x.CustomClasses, x => x.AddContentTypeAsParent)) {
                 treeNode.Enabled = model.Enabled;
                 treeNode.ContentTypes = model.ContentTypes;
-                treeNode.CustomClasses = model.CustomClasses.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                treeNode.AddContentTypeAsParent = model.AddContentTypeAsParent;
+                treeNode.CustomClasses =  string.IsNullOrEmpty( model.CustomClasses) ?  Array.Empty<string>() : model.CustomClasses.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
             };
 
             return Edit(treeNode);

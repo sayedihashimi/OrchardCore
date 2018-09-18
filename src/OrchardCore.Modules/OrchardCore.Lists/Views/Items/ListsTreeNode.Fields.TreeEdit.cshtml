@@ -18,6 +18,7 @@
     </div>
 </fieldset>
 
+
 <fieldset class="form-group">
     <div class="row">
         <div class="col-sm">
@@ -46,8 +47,19 @@
     </div>
 </fieldset>
 
+<fieldset>
+    <div class="form-group form-check">
+        <input asp-for="AddContentTypeAsParent" class="form-check-input" />
+        <label asp-for="AddContentTypeAsParent" class="form-check-label">@T["Add Parent Link"]</label>
+        <span class="hint">@T["Add a parent link named after the content type."]</span>
+    </div>
+</fieldset>
+
 <fieldset class="form-group">
     <label asp-for="CustomClasses">@T["CSS Classes"]</label>
     <input asp-for="CustomClasses" class="form-control" type="text" />
     <span class="hint">@T["A comma separated list of classes that will be added to the tag for every list link."]</span>
 </fieldset>
+
+
+
