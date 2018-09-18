@@ -27,12 +27,21 @@ namespace OrchardCore.Lists.Trees
             return Initialize<ListsTreeNodeViewModel>("ListsTreeNode_Fields_TreeEdit", model =>
             {
                 model.ContentTypes = treeNode.ContentTypes;
+                model.Enabled = treeNode.Enabled;
+                model.CustomClasses = string.Join(",", treeNode.CustomClasses);
             }).Location("Content");
         }
 
         public override async Task<IDisplayResult> UpdateAsync(ListsTreeNode treeNode, IUpdateModel updater)
         {
-            await updater.TryUpdateModelAsync(treeNode, Prefix, x => x.ContentTypes);
+            var model = new ListsTreeNodeViewModel();
+
+            if (await updater.TryUpdateModelAsync(model, Prefix, x => x.ContentTypes)) {
+                treeNode.Enabled = model.Enabled;
+                treeNode.ContentTypes = model.ContentTypes;
+                treeNode.CustomClasses = model.CustomClasses.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            };
+
             return Edit(treeNode);
         }
     }

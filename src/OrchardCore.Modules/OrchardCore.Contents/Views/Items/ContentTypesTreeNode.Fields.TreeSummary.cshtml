@@ -3,9 +3,16 @@
 
 @{
     var contentTypes = Model.Value.ContentTypes;
+    var enabled = Model.Value.Enabled;
 }
 
-<h5>@T["Content Types"]</h5>
+<h5 class="@(enabled ? "" : "text-muted")">
+    @T["Content Types"]
+    @if (enabled == false)
+    {
+        <span class="text-muted font-italic">(@T["Disabled"])</span>
+    }
+</h5>
 
 @if (Model.Value.ShowAll)
 {

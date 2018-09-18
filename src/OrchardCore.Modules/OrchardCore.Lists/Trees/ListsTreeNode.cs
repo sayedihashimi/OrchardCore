@@ -14,5 +14,11 @@ namespace OrchardCore.Lists.Trees
     public class ListsTreeNode : MenuItem
     {
         public string[] ContentTypes { get; set; }
+
+        public bool Enabled { get; set; }
+
+        // classes added through the admin.
+        public string[] CustomClasses { get; set; } = Array.Empty<string>();
+
     }
 }

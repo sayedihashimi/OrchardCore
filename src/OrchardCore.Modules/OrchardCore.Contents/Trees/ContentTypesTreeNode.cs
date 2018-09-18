@@ -14,6 +14,12 @@ namespace OrchardCore.Contents.Trees
     public class ContentTypesTreeNode : MenuItem
     {
         public bool ShowAll { get; set; }
+
         public string[] ContentTypes { get; set; }
+
+        public bool Enabled { get; set; }
+        
+        // classes added through the admin.
+        public string[] CustomClasses { get; set; } = Array.Empty<string>();
     }
 }

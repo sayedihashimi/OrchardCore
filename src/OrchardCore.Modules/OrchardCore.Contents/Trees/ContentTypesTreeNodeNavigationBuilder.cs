@@ -31,7 +31,7 @@ namespace OrchardCore.Contents.Trees
         {
             var tn = treeNode as ContentTypesTreeNode;
 
-            if (tn == null)
+            if ((tn == null) || (!tn.Enabled))
             {
                 return;
             }
@@ -43,9 +43,12 @@ namespace OrchardCore.Contents.Trees
             {
                 var rv = new RouteValueDictionary();
                 rv.Add("Options.TypeName", ctd.Name);
-                builder.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => t.Action("List", "Admin", "OrchardCore.Contents", rv));
+                builder.Add(new LocalizedString(ctd.DisplayName, ctd.DisplayName), t => 
+                {
+                    t.Action("List", "Admin", "OrchardCore.Contents", rv);
+                    tn.CustomClasses.ToList().ForEach( x => t.AddClass(x));
+                } );
             }
-
 
             // Add external children
             foreach (var childTreeNode in tn.Items)
@@ -67,11 +70,6 @@ namespace OrchardCore.Contents.Trees
             }
             
             return typesToShow.OrderBy( t => t.Name);
-        }
-
-        private void AddExternalChildren(MenuItem menuItem , NavigationBuilder builder, IEnumerable<ITreeNodeNavigationBuilder> treeNodeBuilders)
-        {
-
         }
     }
 

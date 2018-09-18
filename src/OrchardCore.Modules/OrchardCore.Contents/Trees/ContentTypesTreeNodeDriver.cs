@@ -28,6 +28,8 @@ namespace OrchardCore.Contents.Trees
             {
                 model.ShowAll = treeNode.ShowAll;
                 model.ContentTypes = treeNode.ContentTypes;
+                model.Enabled = treeNode.Enabled;
+                model.CustomClasses = string.Join("," , treeNode.CustomClasses);                
             }).Location("Content");
         }
 
@@ -36,7 +38,16 @@ namespace OrchardCore.Contents.Trees
             // Initializes the value to empty otherwise the model is not updated if no type is selected.
             treeNode.ContentTypes = Array.Empty<string>();
 
-            await updater.TryUpdateModelAsync(treeNode, Prefix, x => x.ShowAll, x => x.ContentTypes);
+            var model = new ContentTypesTreeNodeViewModel();
+
+            if (await updater.TryUpdateModelAsync(model, Prefix, x => x.ShowAll, x => x.ContentTypes, x => x.Enabled, x => x.CustomClasses)) {
+
+                treeNode.ShowAll = model.ShowAll;
+                treeNode.ContentTypes = model.ContentTypes;
+                treeNode.Enabled = model.Enabled;
+                treeNode.CustomClasses = model.CustomClasses.Split(new[] { " ", "," }, StringSplitOptions.RemoveEmptyEntries);
+            };
+
             return Edit(treeNode);
         }
     }

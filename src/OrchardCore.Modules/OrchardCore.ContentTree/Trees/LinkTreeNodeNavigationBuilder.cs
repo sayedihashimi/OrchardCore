@@ -18,17 +18,18 @@ namespace OrchardCore.ContentTree.Trees
         {
             var ltn = menuItem as LinkTreeNode;
 
-            if (ltn == null)
+            if ((ltn == null) ||( !ltn.Enabled))
             {
                 return;
             }
 
             builder.Add(new LocalizedString(ltn.LinkText, ltn.LinkText), itemBuilder => {
-                
+
                 // Add the actual link
                 itemBuilder.Url(ltn.LinkUrl);
+                ltn.CustomClasses.ToList().ForEach( x => itemBuilder.AddClass(x));
 
-                // Add the childrens of the actual link
+                // Add the other ITreeNodeNavigationBuilder build themselves as children of this link
                 foreach (var childTreeNode in menuItem.Items)
                 {
                     var treeBuilder = treeNodeBuilders.Where(x => x.Name == childTreeNode.GetType().Name).FirstOrDefault();

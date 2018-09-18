@@ -3,9 +3,16 @@
 
 @{
     var contentTypes = Model.Value.ContentTypes;
+    var enabled = Model.Value.Enabled;
 }
 
-<h5>@T["Content types with a list part"]</h5>
+<h5 class="@(enabled ? "" : "text-muted")">
+    @T["Content Types With a List Part"]
+    @if (enabled == false)
+    {
+        <span class="text-muted font-italic">(@T["Disabled"])</span>
+    }
+</h5>
 @if (contentTypes != null && contentTypes.Length > 0)
 {
     @foreach (var contentTypeDefinition in ContentDefinitionManager.ListTypeDefinitions())

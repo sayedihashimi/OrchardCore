@@ -13,8 +13,13 @@ namespace OrchardCore.ContentTree.Trees
     {
         [Required]
         public string LinkText { get; set; }
-        [Required]
+
         public string LinkUrl { get; set; }
+
+        public bool Enabled { get; set; }
+
+        // classes added through the admin.
+        public string[] CustomClasses { get; set; } = Array.Empty<string>();
     }
 
 }

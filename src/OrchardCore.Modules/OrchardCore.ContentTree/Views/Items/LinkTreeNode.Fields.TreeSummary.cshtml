@@ -3,7 +3,14 @@
 @{
     string linkText = Model.Value.LinkText;
     string linkUrl = Model.Value.LinkUrl;
+    bool enabled = Model.Value.Enabled;
 }
 
-<h5>@T["Link"] Tree</h5>
-<code>Link text: @linkText --  Link url: @linkUrl</code>
+<h5 class="@(enabled ? "" : "text-muted")">
+    @T["Link"]
+    @if (enabled == false)
+    {
+        <span class="text-muted font-italic">(@T["Disabled"])</span>
+    }
+</h5>
+<code>@linkText: @linkUrl</code>
