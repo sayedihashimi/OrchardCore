@@ -17,7 +17,7 @@ namespace OrchardCore.Contents.Trees
 
         public string[] ContentTypes { get; set; }
 
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
         
         // classes added through the admin.
         public string[] CustomClasses { get; set; } = Array.Empty<string>();

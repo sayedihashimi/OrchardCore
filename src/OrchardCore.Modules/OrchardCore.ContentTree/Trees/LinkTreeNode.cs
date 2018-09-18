@@ -16,7 +16,7 @@ namespace OrchardCore.ContentTree.Trees
 
         public string LinkUrl { get; set; }
 
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         // classes added through the admin.
         public string[] CustomClasses { get; set; } = Array.Empty<string>();
