@@ -41,7 +41,7 @@ namespace OrchardCore.ContentTree.Trees
                 treeNode.LinkText = model.LinkText;
                 treeNode.LinkUrl = model.LinkUrl;
                 treeNode.Enabled = model.Enabled;
-                treeNode.CustomClasses = model.CustomClasses.Split(new[] {' ' , ',' }, StringSplitOptions.RemoveEmptyEntries);                
+                treeNode.CustomClasses = string.IsNullOrEmpty(model.CustomClasses) ? Array.Empty<string>() : model.CustomClasses.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
             };
             
             return Edit(treeNode);
